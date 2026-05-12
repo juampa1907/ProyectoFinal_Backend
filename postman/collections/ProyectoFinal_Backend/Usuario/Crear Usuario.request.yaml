@@ -1,0 +1,18 @@
+$kind: http-request
+name: Crear Usuario
+url: localhost:8080/api/proyecto/saveUsuario
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\":\"Sof1907\",\r
+
+    \    \"password\":\"User1234\",\r
+
+    \    \"nombreApellido\":\"Vivian Sofia Sierra Rivera\",\r
+
+    \    \"idRol\": 2\r
+
+    }"
+order: 1778601883952

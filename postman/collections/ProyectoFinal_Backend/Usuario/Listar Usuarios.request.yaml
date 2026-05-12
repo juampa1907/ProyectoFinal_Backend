@@ -1,0 +1,4 @@
+$kind: http-request
+url: localhost:8080/api/proyecto/getAll
+method: GET
+order: 3241985232182946

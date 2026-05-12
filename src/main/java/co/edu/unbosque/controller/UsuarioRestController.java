@@ -2,7 +2,7 @@ package co.edu.unbosque.controller;
 
 import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.UsuarioServiceAPI;
-import co.edu.unbosque.utils.ResourceNotFoundException;
+import co.edu.unbosque.utils.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/api/proyecto")
 public class UsuarioRestController {
     
     @Autowired
