@@ -6,13 +6,13 @@ body:
   type: json
   content: "{\r
 
-    \    \"username\":\"Sof1907\",\r
+    \    \"username\":\"Sofi1907\",\r
 
     \    \"password\":\"User1234\",\r
 
     \    \"nombreApellido\":\"Vivian Sofia Sierra Rivera\",\r
 
-    \    \"idRol\": 2\r
+    \    \"idRol\": 6\r
 
     }"
 order: 1778601883952
