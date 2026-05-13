@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(GeneralException.class)
-    public ResponseEntity<ErrorResponse> handlerGlobalException(GlobalExceptionHandler ex){
+    public ResponseEntity<ErrorResponse> handlerGlobalException(GeneralException ex){
         ErrorResponse error = new ErrorResponse(500, "Error interno del servidor");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

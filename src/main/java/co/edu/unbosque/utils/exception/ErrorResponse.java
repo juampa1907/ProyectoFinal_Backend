@@ -32,4 +32,12 @@ public class ErrorResponse {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    public LocalDateTime getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(LocalDateTime timeStamp) {
+        this.timeStamp = timeStamp;
+    }
 }
