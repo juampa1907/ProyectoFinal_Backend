@@ -1,5 +1,5 @@
 $kind: http-request
-name: localhost:8080/api/proyecto/updateUsuario
+name: Actualizar Usuario
 url: localhost:8080/api/proyecto/updateUsuario
 method: PUT
 body:

@@ -1,0 +1,13 @@
+$kind: http-request
+url: localhost:8080/api/proyecto/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\" : \"Juampa1907\",\r
+
+    \    \"password\" : \"Admin12345\"\r
+
+    }"
+order: 4501061416149008

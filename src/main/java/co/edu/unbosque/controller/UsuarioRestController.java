@@ -4,6 +4,7 @@ import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.UsuarioServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
+import co.edu.unbosque.utils.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -74,6 +76,16 @@ public class UsuarioRestController {
             throw e;
         } catch (Exception e){
             throw new GeneralException("Error al actualizar el usuario: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request) throws UnauthorizedException{
+        Optional<Usuario> resultado = usuarioServiceAPI.findByUsernameAndPassword(request.getUsername(), request.getPassword());
+        if(resultado.isPresent()){
+            return ResponseEntity.ok(resultado.get());
+        } else {
+            throw new UnauthorizedException("Usuario o contraseña incorrectos");
         }
     }
 
