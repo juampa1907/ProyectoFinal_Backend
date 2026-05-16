@@ -24,4 +24,16 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario, Integer> imp
     public Optional<Usuario> findByUsernameAndPassword(String username, String password) {
         return usuarioRepository.findByUsernameAndPassword(username, password);
     }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return usuarioRepository.existsByUsername(username);
+    }
+
+    @Override
+    public boolean existsByNombreApellido(String nombreApellido) {
+        return usuarioRepository.existsByNombreApellido(nombreApellido);
+    }
+
+
 }

@@ -1,5 +1,5 @@
 $kind: http-request
 name: Eliminar Usuario
-url: localhost:8080/api/proyecto/deleteUsuario/33
+url: localhost:8080/ProyectoFinal_Backend/api/proyecto/deleteUsuario/33
 method: DELETE
 order: 4489814966220774

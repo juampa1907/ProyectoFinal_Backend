@@ -3,6 +3,7 @@ package co.edu.unbosque.controller;
 import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.UsuarioServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
+import co.edu.unbosque.utils.exception.ResourceDuplicateException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
 import co.edu.unbosque.utils.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,19 @@ public class UsuarioRestController {
     }
     
     @PostMapping(value = "/saveUsuario")
-    public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario) throws GeneralException {
+    public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario) throws GeneralException, ResourceDuplicateException {
         try{
+            boolean existeUsuario = usuarioServiceAPI.existsByUsername(usuario.getUsername());
+            boolean existeNombreApellido = usuarioServiceAPI.existsByNombreApellido(usuario.getNombreApellido());
+            if(existeUsuario){
+                throw new ResourceDuplicateException("Usuario " +  usuario.getUsername() + " ya existente");
+            }
+            if (existeNombreApellido){
+                throw new ResourceDuplicateException("Nombre: " + usuario.getNombreApellido() + " ya existente");
+            }
            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioServiceAPI.save(usuario));
+        } catch (ResourceDuplicateException e) {
+            throw e;
         } catch (Exception e){
             throw new GeneralException("Error al guardar el usuario: " + e.getMessage());
         }

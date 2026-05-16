@@ -1,5 +1,6 @@
 $kind: http-request
-url: localhost:8080/api/proyecto/login
+name: Ingreso de Usuario
+url: localhost:8080/ProyectoFinal_Backend/api/proyecto/login
 method: POST
 body:
   type: json
