@@ -1,5 +1,5 @@
 $kind: http-request
 name: Listar Usuarios
-url: localhost:8080/ProyectoFinal_Backend/api/proyecto/getAll
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/getAll
 method: GET
 order: 3241985232182946

@@ -17,7 +17,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/proyecto")
+@RequestMapping("/api/usuario")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UsuarioRestController {
     
@@ -70,19 +70,27 @@ public class UsuarioRestController {
     @PutMapping("/updateUsuario")
     public ResponseEntity<Usuario> updateUsuario(@RequestBody Usuario usuario) throws ResourceNotFoundException, GeneralException{
         try{
-            Usuario user = usuarioServiceAPI.get(usuario.getIdUsuario());
-            if(user == null){
+
+            Usuario existente = usuarioServiceAPI.get(usuario.getIdUsuario());
+
+            if(existente == null){
                 throw new ResourceNotFoundException("Usuario no encontrado con id: " + usuario.getIdUsuario());
             }
-            String passwordActual = user.getPassword();
-            user.setUsername(usuario.getUsername());
-            user.setPassword(usuario.getPassword());
-            user.setNombreApellido(usuario.getNombreApellido());
-            user.setEstado(usuario.getEstado());
-            if (!usuario.getPassword().equals(passwordActual)){
-                user.setFechaUltClave(LocalDateTime.now());
+
+            if (usuario.getUsername() != null) existente.setUsername(usuario.getUsername());
+            if (usuario.getNombreApellido() != null) existente.setNombreApellido(usuario.getNombreApellido());
+            if (usuario.getCorreo() != null) existente.setCorreo(usuario.getCorreo());
+            if (usuario.getPassword() != null) {
+                existente.setPassword(usuario.getPassword());
+                existente.setFechaUltClave(LocalDateTime.now());
             }
-            return ResponseEntity.ok(usuarioServiceAPI.update(user));
+            if (usuario.getIdRol() != null) existente.setIdRol(usuario.getIdRol());
+            if (usuario.getEstado() != null) existente.setEstado(usuario.getEstado());
+
+            Usuario resultado = usuarioServiceAPI.update(existente);
+
+            return ResponseEntity.ok(resultado);
+
         } catch (ResourceNotFoundException e){
             throw e;
         } catch (Exception e){
