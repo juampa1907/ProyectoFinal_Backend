@@ -29,4 +29,9 @@ public class JugadorServiceImpl extends GenericServiceImpl<Jugador, Integer> imp
     public List<Jugador> findByEstado(String estado) {
         return jugadorRepository.findByEstado(estado);
     }
+
+    @Override
+    public boolean existsByNombre(String nombre) {
+        return jugadorRepository.existsByNombre(nombre);
+    }
 }

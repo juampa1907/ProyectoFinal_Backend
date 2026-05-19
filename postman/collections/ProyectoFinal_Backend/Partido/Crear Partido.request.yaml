@@ -1,0 +1,18 @@
+$kind: http-request
+name: Crear Partido
+url: localhost:8080/ProyectoFinal_Backend/api/partido/savePartido
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"idEquipoLocal\": 1,\r
+
+    \    \"idEquipoVisitante\": 2,\r
+
+    \    \"fase\": \"Grupos\",\r
+
+    \    \"fechaHora\": \"2026-06-11T14:00:00\"\r
+
+    }"
+order: 2918324578139437

@@ -18,4 +18,9 @@ public class GrupoServiceImpl extends GenericServiceImpl<Grupo, String> implemen
     public CrudRepository<Grupo, String> getDao() {
         return grupoRepository;
     }
+
+    @Override
+    public boolean existsByIdGrupo(String idGrupo) {
+        return grupoRepository.existsByIdGrupo(idGrupo);
+    }
 }

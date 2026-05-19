@@ -1,0 +1,5 @@
+$kind: http-request
+name: Encontrar Equipo por ID
+url: localhost:8080/ProyectoFinal_Backend/api/equipo/findRecord/27
+method: GET
+order: 4322039851789682

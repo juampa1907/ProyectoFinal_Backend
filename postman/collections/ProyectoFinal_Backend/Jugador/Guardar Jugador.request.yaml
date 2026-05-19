@@ -1,0 +1,18 @@
+$kind: http-request
+name: Guardar Jugador
+url: localhost:8080/ProyectoFinal_Backend/api/jugador/saveJugador
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"idEquipo\":37,\r
+
+    \    \"nombre\" : \"Lionel Andrés Messi Cuccitini\",\r
+
+    \    \"numeroCamiseta\": 10,\r
+
+    \    \"fechaNacimiento\": \"1987-06-24\"\r
+
+    }"
+order: 480797746182291

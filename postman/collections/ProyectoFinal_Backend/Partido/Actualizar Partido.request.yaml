@@ -1,0 +1,26 @@
+$kind: http-request
+name: Actualizar Partido
+url: localhost:8080/ProyectoFinal_Backend/api/partido/updatePartido
+method: PUT
+body:
+  type: json
+  content: " {\r
+
+    \        \"estado\": \"A\",\r
+
+    \        \"fase\": \"Grupos\",\r
+
+    \        \"fechaHora\": \"2026-06-11T14:00:00\",\r
+
+    \        \"golesLocal\": 0,\r
+
+    \        \"golesVisitante\": 0,\r
+
+    \        \"idEquipoLocal\": 1,\r
+
+    \        \"idEquipoVisitante\": 2,\r
+
+    \        \"idPartido\": 1\r
+
+    \    }"
+order: 4227814314522269

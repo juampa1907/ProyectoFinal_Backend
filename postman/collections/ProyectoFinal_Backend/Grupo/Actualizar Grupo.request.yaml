@@ -1,0 +1,14 @@
+$kind: http-request
+name: Actualizar Grupo
+url: localhost:8080/ProyectoFinal_Backend/api/grupo/updateGrupo
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"idGrupo\":\"A\",\r
+
+    \    \"estado\":\"I\"\r
+
+    }"
+order: 4468530206905333

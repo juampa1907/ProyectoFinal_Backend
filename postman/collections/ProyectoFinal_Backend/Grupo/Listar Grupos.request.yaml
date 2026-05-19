@@ -1,0 +1,5 @@
+$kind: http-request
+name: Listar Grupos
+url: localhost:8080/ProyectoFinal_Backend/api/grupo/getAll
+method: GET
+order: 4466454399898446

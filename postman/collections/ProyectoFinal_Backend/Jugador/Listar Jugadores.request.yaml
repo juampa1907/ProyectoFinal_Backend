@@ -1,0 +1,4 @@
+$kind: http-request
+url: localhost:8080/ProyectoFinal_Backend/api/jugador/getAll
+method: GET
+order: 1779205926915

@@ -1,0 +1,22 @@
+$kind: http-request
+name: Actualizar Equipo
+url: localhost:8080/ProyectoFinal_Backend/api/equipo/updateEquipo
+method: PUT
+body:
+  type: json
+  content: "    {\r
+
+    \        \"bandera\": \"http://flagcdn.com/20x15/mx.png\",\r
+
+    \        \"entrenador\": \"Javier Aguirre\",\r
+
+    \        \"estado\": \"A\",\r
+
+    \        \"idEquipo\": 1,\r
+
+    \        \"idGrupo\": \"A\",\r
+
+    \        \"nombre\": \"México\"\r
+
+    \    }"
+order: 4160049124690886

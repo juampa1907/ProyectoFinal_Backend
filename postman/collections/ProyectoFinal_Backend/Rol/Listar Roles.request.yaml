@@ -1,0 +1,5 @@
+$kind: http-request
+name: Listar Roles
+url: localhost:8080/ProyectoFinal_Backend/api/rol/getAll
+method: GET
+order: 1779205207824
