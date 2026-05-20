@@ -42,9 +42,7 @@ public class RolRestController {
             if(existente == null){
                 throw new ResourceNotFoundException("Rol no encontrado con id: " + rol.getIdRol());
             }
-            if (rol.getNombreRol() != null) existente.setNombreRol(rol.getNombreRol());
-            if (rol.getEstado() != null) existente.setEstado(rol.getEstado());
-            Rol resultado = rolServiceAPI.update(existente);
+            Rol resultado = rolServiceAPI.update(rol);
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
             throw e;

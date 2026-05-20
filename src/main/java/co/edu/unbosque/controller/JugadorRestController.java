@@ -26,17 +26,19 @@ public class JugadorRestController {
     }
     
     @PostMapping(value = "/saveJugador")
-    public ResponseEntity<Jugador> saveJugador(@RequestBody Jugador jugador) throws GeneralException, ResourceDuplicateException {
+    public ResponseEntity<List<Jugador>> saveJugadores(@RequestBody List<Jugador> jugadores) throws GeneralException, ResourceDuplicateException {
         try{
-            boolean existeJugador = jugadorServiceAPI.existsByNombre(jugador.getNombre());
-            if(existeJugador){
-                throw new ResourceDuplicateException("Jugador " + jugador.getNombre() + " ya existente");
+            for (Jugador jugador : jugadores) {
+                boolean existeJugador = jugadorServiceAPI.existsByNombre(jugador.getNombre());
+                if(existeJugador){
+                    throw new ResourceDuplicateException("Jugador " + jugador.getNombre() + " ya existente");
+                }
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body(jugadorServiceAPI.save(jugador));
+            return ResponseEntity.status(HttpStatus.CREATED).body(jugadorServiceAPI.saveAll(jugadores));
         } catch (ResourceDuplicateException e) {
             throw e;
         } catch (Exception e){
-            throw new GeneralException("Error al guardar el jugador: " + e.getMessage());
+            throw new GeneralException("Error al guardar los jugadores: " + e.getMessage());
         }
     }
     
