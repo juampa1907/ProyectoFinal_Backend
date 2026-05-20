@@ -20,7 +20,7 @@ public class WebController {
     
     @GetMapping()
     public String root() {
-        return "redirect:/login";
+        return "redirect:/api/inicio/login";
     }
     
     @GetMapping("/login")
@@ -36,7 +36,7 @@ public class WebController {
         return usuarioServiceAPI.findByUsernameAndPassword(username, password)
                 .map(usuario -> {
                     session.setAttribute("usuario", usuario);
-                    return "redirect:/principal";
+                    return "redirect:/api/inicio/principal";
                 })
                 .orElseGet(() -> {
                     model.addAttribute("error", "Usuario o contraseña incorrectos");
@@ -47,7 +47,7 @@ public class WebController {
     @GetMapping("/principal")
     public String principal(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) return "redirect:/login";
+        if (usuario == null) return "redirect:/api/inicio/login";
         model.addAttribute("usuario", usuario);
         return "principal";
     }
@@ -55,7 +55,7 @@ public class WebController {
     @GetMapping("/usuarios")
     public String usuarios(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) return "redirect:/login";
+        if (usuario == null) return "redirect:/api/inicio/login";
         model.addAttribute("usuarios", usuarioServiceAPI.getAll());
         return "usuarios";
     }
@@ -63,6 +63,6 @@ public class WebController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:/api/inicio/login";
     }
 }
