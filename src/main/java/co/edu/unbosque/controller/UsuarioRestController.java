@@ -2,6 +2,7 @@ package co.edu.unbosque.controller;
 
 import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.UsuarioServiceAPI;
+import co.edu.unbosque.utils.HashUtil;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
@@ -80,8 +81,8 @@ public class UsuarioRestController {
             if (usuario.getUsername() != null) existente.setUsername(usuario.getUsername());
             if (usuario.getNombreApellido() != null) existente.setNombreApellido(usuario.getNombreApellido());
             if (usuario.getCorreo() != null) existente.setCorreo(usuario.getCorreo());
-            if (usuario.getPassword() != null) {
-                existente.setPassword(usuario.getPassword());
+            if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+                existente.setPassword(HashUtil.hashSHA1(usuario.getPassword()));
                 existente.setFechaUltClave(LocalDateTime.now());
             }
             if (usuario.getIdRol() != null) existente.setIdRol(usuario.getIdRol());

@@ -34,6 +34,8 @@ public class PartidoRestController {
                 throw new GeneralException("El equipo local y el equipo visitante no pueden ser el mismo");
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(partidoServiceAPI.save(partido));
+        } catch (GeneralException e){
+            throw e;
         } catch (Exception e){
             throw new GeneralException("Error al guardar el partido: " + e.getMessage());
         }

@@ -25,6 +25,31 @@ public class GrupoRestController {
         return ResponseEntity.ok(grupoServiceAPI.getAll());
     }
     
+    @PostMapping(value = "/saveGrupo")
+    public ResponseEntity<Grupo> saveGrupo(@RequestBody Grupo grupo) throws GeneralException, ResourceDuplicateException {
+        try {
+            boolean existeGrupo = grupoServiceAPI.existsByIdGrupo(grupo.getIdGrupo());
+            if (existeGrupo) {
+                throw new ResourceDuplicateException("Grupo " + grupo.getIdGrupo() + " ya existente");
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(grupoServiceAPI.save(grupo));
+        } catch (ResourceDuplicateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException("Error al guardar el grupo: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping(value = "/deleteGrupo/{id}")
+    public ResponseEntity<Void> deleteGrupo(@PathVariable String id) throws ResourceNotFoundException {
+        Grupo grupo = grupoServiceAPI.get(id);
+        if (grupo == null) {
+            throw new ResourceNotFoundException("Grupo no encontrado con id: " + id);
+        }
+        grupoServiceAPI.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Grupo> getGrupoById(@PathVariable String id) throws ResourceNotFoundException{
         Grupo grupo = grupoServiceAPI.get(id);

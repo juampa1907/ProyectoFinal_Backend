@@ -25,6 +25,31 @@ public class EquipoRestController {
         return ResponseEntity.ok(equipoServiceAPI.getAll());
     }
     
+    @PostMapping(value = "/saveEquipo")
+    public ResponseEntity<Equipo> saveEquipo(@RequestBody Equipo equipo) throws GeneralException, ResourceDuplicateException {
+        try {
+            boolean existeEquipo = equipoServiceAPI.existsByNombre(equipo.getNombre());
+            if (existeEquipo) {
+                throw new ResourceDuplicateException("Equipo " + equipo.getNombre() + " ya existente");
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(equipoServiceAPI.save(equipo));
+        } catch (ResourceDuplicateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException("Error al guardar el equipo: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping(value = "/deleteEquipo/{id}")
+    public ResponseEntity<Void> deleteEquipo(@PathVariable Integer id) throws ResourceNotFoundException {
+        Equipo equipo = equipoServiceAPI.get(id);
+        if (equipo == null) {
+            throw new ResourceNotFoundException("Equipo no encontrado con id: " + id);
+        }
+        equipoServiceAPI.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Equipo> getEquipoById(@PathVariable Integer id) throws ResourceNotFoundException{
         Equipo equipo = equipoServiceAPI.get(id);
