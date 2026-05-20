@@ -1,6 +1,8 @@
 package co.edu.unbosque.controller;
 
+import co.edu.unbosque.entity.Auditoria;
 import co.edu.unbosque.entity.Rol;
+import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.service.api.RolServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
@@ -20,6 +22,9 @@ public class RolRestController {
     @Autowired
     private RolServiceAPI rolServiceAPI;
 
+    @Autowired
+    private AuditoriaServiceAPI auditoriaServiceAPI;
+
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Rol>> getAllRoles() {
         return ResponseEntity.ok(rolServiceAPI.getAll());
@@ -36,15 +41,20 @@ public class RolRestController {
     }
 
     @PutMapping("/updateRol")
-    public ResponseEntity<Rol> updateRol(@RequestBody Rol rol) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Rol> updateRol(@RequestBody Rol rol, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
         try{
             Rol existente = rolServiceAPI.get(rol.getIdRol());
             if(existente == null){
                 throw new ResourceNotFoundException("Rol no encontrado con id: " + rol.getIdRol());
             }
-            if (rol.getNombreRol() != null) existente.setNombreRol(rol.getNombreRol());
-            if (rol.getEstado() != null) existente.setEstado(rol.getEstado());
-            Rol resultado = rolServiceAPI.update(existente);
+            Rol resultado = rolServiceAPI.update(rol);
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(idUsuario);
+            audit.setAccion("UPDATE");
+            audit.setTablaAfectada("ROLES");
+            audit.setIdRegistroAfectado(resultado.getIdRol());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
             throw e;

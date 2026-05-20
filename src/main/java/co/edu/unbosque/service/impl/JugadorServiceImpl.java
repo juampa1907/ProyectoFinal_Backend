@@ -7,6 +7,7 @@ import co.edu.unbosque.utils.GenericServiceImpl;
 import co.edu.unbosque.entity.Jugador;
 import co.edu.unbosque.service.api.JugadorServiceAPI;
 import co.edu.unbosque.repository.JugadorRepository;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -33,5 +34,13 @@ public class JugadorServiceImpl extends GenericServiceImpl<Jugador, Integer> imp
     @Override
     public boolean existsByNombre(String nombre) {
         return jugadorRepository.existsByNombre(nombre);
+    }
+
+    @Override
+    @Transactional
+    public List<Jugador> saveAll(List<Jugador> jugadores) {
+        List<Jugador> result = new java.util.ArrayList<>();
+        jugadorRepository.saveAll(jugadores).forEach(result::add);
+        return result;
     }
 }
