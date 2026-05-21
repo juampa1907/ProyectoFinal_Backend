@@ -30,7 +30,7 @@ public class PartidoRestController {
     }
     
     @PostMapping(value = "/savePartido")
-    public ResponseEntity<Partido> savePartido(@RequestBody Partido partido, @RequestHeader("X-User-Id") Integer idUsuario) throws GeneralException {
+    public ResponseEntity<Partido> savePartido(@RequestBody Partido partido) throws GeneralException {
         try{
             if(partido.getIdEquipoLocal() == null || partido.getIdEquipoVisitante() == null){
                 throw new GeneralException("El partido debe tener un equipo local y un equipo visitante");
@@ -40,7 +40,7 @@ public class PartidoRestController {
             }
             Partido guardado = partidoServiceAPI.save(partido);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(guardado.getIdPartido());
             audit.setAccion("CREATE");
             audit.setTablaAfectada("PARTIDOS");
             audit.setIdRegistroAfectado(guardado.getIdPartido());
@@ -62,14 +62,14 @@ public class PartidoRestController {
     }
     
     @DeleteMapping(value = "/deletePartido/{id}")
-    public ResponseEntity<Void> deletePartido(@PathVariable Integer id, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException {
+    public ResponseEntity<Void> deletePartido(@PathVariable Integer id) throws ResourceNotFoundException {
         Partido partido = partidoServiceAPI.get(id);
         if (partido == null){
             throw new ResourceNotFoundException("Partido no encontrado con id: " + id);
         }
         partidoServiceAPI.delete(id);
         Auditoria audit = new Auditoria();
-        audit.setIdUsuario(idUsuario);
+        audit.setIdUsuario(id);
         audit.setAccion("DELETE");
         audit.setTablaAfectada("PARTIDOS");
         audit.setIdRegistroAfectado(id);
@@ -79,7 +79,7 @@ public class PartidoRestController {
     }
 
     @PutMapping("/updatePartido")
-    public ResponseEntity<Partido> updatePartido(@RequestBody Partido partido, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Partido> updatePartido(@RequestBody Partido partido) throws ResourceNotFoundException, GeneralException{
         try{
             Partido existente = partidoServiceAPI.get(partido.getIdPartido());
             if(existente == null){
@@ -94,7 +94,7 @@ public class PartidoRestController {
             if (partido.getEstado() != null) existente.setEstado(partido.getEstado());
             Partido resultado = partidoServiceAPI.update(existente);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(resultado.getIdPartido());
             audit.setAccion("UPDATE");
             audit.setTablaAfectada("PARTIDOS");
             audit.setIdRegistroAfectado(resultado.getIdPartido());

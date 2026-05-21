@@ -31,7 +31,7 @@ public class JugadorRestController {
     }
     
     @PostMapping(value = "/saveJugador")
-    public ResponseEntity<List<Jugador>> saveJugadores(@RequestBody List<Jugador> jugadores, @RequestHeader("X-User-Id") Integer idUsuario) throws GeneralException, ResourceDuplicateException {
+    public ResponseEntity<List<Jugador>> saveJugadores(@RequestBody List<Jugador> jugadores) throws GeneralException, ResourceDuplicateException {
         try{
             for (Jugador jugador : jugadores) {
                 boolean existeJugador = jugadorServiceAPI.existsByNombre(jugador.getNombre());
@@ -42,7 +42,7 @@ public class JugadorRestController {
             List<Jugador> guardados = jugadorServiceAPI.saveAll(jugadores);
             for (Jugador jugador : guardados) {
                 Auditoria audit = new Auditoria();
-                audit.setIdUsuario(idUsuario);
+                audit.setIdUsuario(jugador.getIdJugador());
                 audit.setAccion("CREATE");
                 audit.setTablaAfectada("JUGADORES");
                 audit.setIdRegistroAfectado(jugador.getIdJugador());
@@ -67,14 +67,14 @@ public class JugadorRestController {
     }
     
     @DeleteMapping(value = "/deleteJugador/{id}")
-    public ResponseEntity<Void> deleteJugador(@PathVariable Integer id, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException {
+    public ResponseEntity<Void> deleteJugador(@PathVariable Integer id) throws ResourceNotFoundException {
         Jugador jugador = jugadorServiceAPI.get(id);
         if (jugador == null){
             throw new ResourceNotFoundException("Jugador no encontrado con id: " + id);
         }
         jugadorServiceAPI.delete(id);
         Auditoria audit = new Auditoria();
-        audit.setIdUsuario(idUsuario);
+        audit.setIdUsuario(id);
         audit.setAccion("DELETE");
         audit.setTablaAfectada("JUGADORES");
         audit.setIdRegistroAfectado(id);
@@ -84,7 +84,7 @@ public class JugadorRestController {
     }
 
     @PutMapping("/updateJugador")
-    public ResponseEntity<Jugador> updateJugador(@RequestBody Jugador jugador, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Jugador> updateJugador(@RequestBody Jugador jugador) throws ResourceNotFoundException, GeneralException{
         try{
             Jugador existente = jugadorServiceAPI.get(jugador.getIdJugador());
             if(existente == null){
@@ -98,7 +98,7 @@ public class JugadorRestController {
             if (jugador.getEstado() != null) existente.setEstado(jugador.getEstado());
             Jugador resultado = jugadorServiceAPI.update(existente);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(resultado.getIdJugador());
             audit.setAccion("UPDATE");
             audit.setTablaAfectada("JUGADORES");
             audit.setIdRegistroAfectado(resultado.getIdJugador());

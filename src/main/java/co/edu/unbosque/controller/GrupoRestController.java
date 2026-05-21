@@ -65,7 +65,7 @@ public class GrupoRestController {
     }
 
     @PutMapping("/updateGrupo")
-    public ResponseEntity<Grupo> updateGrupo(@RequestBody Grupo grupo, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Grupo> updateGrupo(@RequestBody Grupo grupo) throws ResourceNotFoundException, GeneralException{
         try{
             Grupo existente = grupoServiceAPI.get(grupo.getIdGrupo());
             if(existente == null){
@@ -75,7 +75,7 @@ public class GrupoRestController {
             if (grupo.getEstado() != null) existente.setEstado(grupo.getEstado());
             Grupo resultado = grupoServiceAPI.update(existente);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(1);
             audit.setAccion("UPDATE");
             audit.setTablaAfectada("GRUPOS");
             audit.setIpCliente("127.0.0.1");

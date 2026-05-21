@@ -36,7 +36,7 @@ public class UsuarioRestController {
     }
     
     @PostMapping(value = "/saveUsuario")
-    public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario, @RequestHeader("X-User-Id") Integer idUsuario) throws GeneralException, ResourceDuplicateException {
+    public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario) throws GeneralException, ResourceDuplicateException {
         try{
             boolean existeUsuario = usuarioServiceAPI.existsByUsername(usuario.getUsername());
             boolean existeNombreApellido = usuarioServiceAPI.existsByNombreApellido(usuario.getNombreApellido());
@@ -48,7 +48,7 @@ public class UsuarioRestController {
             }
             Usuario guardado = usuarioServiceAPI.save(usuario);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(guardado.getIdUsuario());
             audit.setAccion("CREATE");
             audit.setTablaAfectada("USUARIOS");
             audit.setIdRegistroAfectado(guardado.getIdUsuario());
@@ -72,14 +72,14 @@ public class UsuarioRestController {
     }
     
     @DeleteMapping(value = "/deleteUsuario/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException {
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id) throws ResourceNotFoundException {
         Usuario usuario = usuarioServiceAPI.get(id);
         if (usuario == null){
             throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);
         }
         usuarioServiceAPI.delete(id);
         Auditoria audit = new Auditoria();
-        audit.setIdUsuario(idUsuario);
+        audit.setIdUsuario(id);
         audit.setAccion("DELETE");
         audit.setTablaAfectada("USUARIOS");
         audit.setIdRegistroAfectado(id);
@@ -89,7 +89,7 @@ public class UsuarioRestController {
     }
 
     @PutMapping("/updateUsuario")
-    public ResponseEntity<Usuario> updateUsuario(@RequestBody Usuario usuario, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Usuario> updateUsuario(@RequestBody Usuario usuario) throws ResourceNotFoundException, GeneralException{
         try{
 
             Usuario existente = usuarioServiceAPI.get(usuario.getIdUsuario());
@@ -111,7 +111,7 @@ public class UsuarioRestController {
             Usuario resultado = usuarioServiceAPI.update(existente);
 
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(resultado.getIdUsuario());
             audit.setAccion("UPDATE");
             audit.setTablaAfectada("USUARIOS");
             audit.setIdRegistroAfectado(resultado.getIdUsuario());
@@ -128,11 +128,11 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request, @RequestHeader("X-User-Id") Integer idUsuario) throws UnauthorizedException{
+    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request) throws UnauthorizedException{
         Optional<Usuario> resultado = usuarioServiceAPI.findByUsernameAndPassword(request.getUsername(), request.getPassword());
         if(resultado.isPresent()){
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(resultado.get().getIdUsuario());
             audit.setAccion("LOGIN");
             audit.setTablaAfectada("USUARIOS");
             audit.setIdRegistroAfectado(resultado.get().getIdUsuario());

@@ -66,7 +66,7 @@ public class RolRestController {
     }
 
     @PutMapping("/updateRol")
-    public ResponseEntity<Rol> updateRol(@RequestBody Rol rol, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Rol> updateRol(@RequestBody Rol rol) throws ResourceNotFoundException, GeneralException{
         try{
             Rol existente = rolServiceAPI.get(rol.getIdRol());
             if(existente == null){
@@ -74,7 +74,7 @@ public class RolRestController {
             }
             Rol resultado = rolServiceAPI.update(rol);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(resultado.getIdRol());
             audit.setAccion("UPDATE");
             audit.setTablaAfectada("ROLES");
             audit.setIdRegistroAfectado(resultado.getIdRol());

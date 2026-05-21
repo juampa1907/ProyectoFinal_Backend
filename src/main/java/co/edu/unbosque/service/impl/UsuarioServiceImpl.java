@@ -32,7 +32,6 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario, Integer> imp
 
     @Override
     public Usuario update(Usuario usuario) {
-        // La contraseña llega ya hasheada desde la BD; se persiste sin re-hashear
         return usuarioRepository.save(usuario);
     }
 

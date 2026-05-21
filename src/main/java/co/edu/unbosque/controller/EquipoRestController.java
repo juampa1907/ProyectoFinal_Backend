@@ -66,7 +66,7 @@ public class EquipoRestController {
     }
 
     @PutMapping("/updateEquipo")
-    public ResponseEntity<Equipo> updateEquipo(@RequestBody Equipo equipo, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Equipo> updateEquipo(@RequestBody Equipo equipo) throws ResourceNotFoundException, GeneralException{
         try{
             Equipo existente = equipoServiceAPI.get(equipo.getIdEquipo());
             if(existente == null){
@@ -79,7 +79,7 @@ public class EquipoRestController {
             if (equipo.getEstado() != null) existente.setEstado(equipo.getEstado());
             Equipo resultado = equipoServiceAPI.update(existente);
             Auditoria audit = new Auditoria();
-            audit.setIdUsuario(idUsuario);
+            audit.setIdUsuario(resultado.getIdEquipo());
             audit.setAccion("UPDATE");
             audit.setTablaAfectada("EQUIPOS");
             audit.setIdRegistroAfectado(resultado.getIdEquipo());
