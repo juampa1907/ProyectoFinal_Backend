@@ -1,6 +1,8 @@
 package co.edu.unbosque.controller;
 
+import co.edu.unbosque.entity.Auditoria;
 import co.edu.unbosque.entity.Equipo;
+import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.service.api.EquipoServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
@@ -19,6 +21,9 @@ public class EquipoRestController {
     
     @Autowired
     private EquipoServiceAPI equipoServiceAPI;
+
+    @Autowired
+    private AuditoriaServiceAPI auditoriaServiceAPI;
     
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Equipo>> getAllEquipos() {
@@ -52,6 +57,7 @@ public class EquipoRestController {
 
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Equipo> getEquipoById(@PathVariable Integer id) throws ResourceNotFoundException{
+
         Equipo equipo = equipoServiceAPI.get(id);
         if(equipo == null){
             throw new ResourceNotFoundException("Equipo no encontrado con id: " + id);
@@ -60,7 +66,7 @@ public class EquipoRestController {
     }
 
     @PutMapping("/updateEquipo")
-    public ResponseEntity<Equipo> updateEquipo(@RequestBody Equipo equipo) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Equipo> updateEquipo(@RequestBody Equipo equipo, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
         try{
             Equipo existente = equipoServiceAPI.get(equipo.getIdEquipo());
             if(existente == null){
@@ -72,6 +78,13 @@ public class EquipoRestController {
             if (equipo.getBandera() != null) existente.setBandera(equipo.getBandera());
             if (equipo.getEstado() != null) existente.setEstado(equipo.getEstado());
             Equipo resultado = equipoServiceAPI.update(existente);
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(idUsuario);
+            audit.setAccion("UPDATE");
+            audit.setTablaAfectada("EQUIPOS");
+            audit.setIdRegistroAfectado(resultado.getIdEquipo());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
             throw e;

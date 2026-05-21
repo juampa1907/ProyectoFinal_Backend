@@ -1,6 +1,8 @@
 package co.edu.unbosque.controller;
 
+import co.edu.unbosque.entity.Auditoria;
 import co.edu.unbosque.entity.Usuario;
+import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.service.api.UsuarioServiceAPI;
 import co.edu.unbosque.utils.HashUtil;
 import co.edu.unbosque.utils.exception.GeneralException;
@@ -24,6 +26,9 @@ public class UsuarioRestController {
     
     @Autowired
     private UsuarioServiceAPI usuarioServiceAPI;
+
+    @Autowired
+    private AuditoriaServiceAPI auditoriaServiceAPI;
     
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
@@ -31,7 +36,7 @@ public class UsuarioRestController {
     }
     
     @PostMapping(value = "/saveUsuario")
-    public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario) throws GeneralException, ResourceDuplicateException {
+    public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario, @RequestHeader("X-User-Id") Integer idUsuario) throws GeneralException, ResourceDuplicateException {
         try{
             boolean existeUsuario = usuarioServiceAPI.existsByUsername(usuario.getUsername());
             boolean existeNombreApellido = usuarioServiceAPI.existsByNombreApellido(usuario.getNombreApellido());
@@ -41,7 +46,15 @@ public class UsuarioRestController {
             if (existeNombreApellido){
                 throw new ResourceDuplicateException("Nombre: " + usuario.getNombreApellido() + " ya existente");
             }
-           return ResponseEntity.status(HttpStatus.CREATED).body(usuarioServiceAPI.save(usuario));
+            Usuario guardado = usuarioServiceAPI.save(usuario);
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(idUsuario);
+            audit.setAccion("CREATE");
+            audit.setTablaAfectada("USUARIOS");
+            audit.setIdRegistroAfectado(guardado.getIdUsuario());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
+            return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (ResourceDuplicateException e) {
             throw e;
         } catch (Exception e){
@@ -59,17 +72,24 @@ public class UsuarioRestController {
     }
     
     @DeleteMapping(value = "/deleteUsuario/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id) throws ResourceNotFoundException {
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException {
         Usuario usuario = usuarioServiceAPI.get(id);
         if (usuario == null){
             throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);
         }
         usuarioServiceAPI.delete(id);
+        Auditoria audit = new Auditoria();
+        audit.setIdUsuario(idUsuario);
+        audit.setAccion("DELETE");
+        audit.setTablaAfectada("USUARIOS");
+        audit.setIdRegistroAfectado(id);
+        audit.setIpCliente("127.0.0.1");
+        auditoriaServiceAPI.save(audit);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/updateUsuario")
-    public ResponseEntity<Usuario> updateUsuario(@RequestBody Usuario usuario) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Usuario> updateUsuario(@RequestBody Usuario usuario, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
         try{
 
             Usuario existente = usuarioServiceAPI.get(usuario.getIdUsuario());
@@ -90,6 +110,14 @@ public class UsuarioRestController {
 
             Usuario resultado = usuarioServiceAPI.update(existente);
 
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(idUsuario);
+            audit.setAccion("UPDATE");
+            audit.setTablaAfectada("USUARIOS");
+            audit.setIdRegistroAfectado(resultado.getIdUsuario());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
+
             return ResponseEntity.ok(resultado);
 
         } catch (ResourceNotFoundException e){
@@ -100,9 +128,16 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request) throws UnauthorizedException{
+    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request, @RequestHeader("X-User-Id") Integer idUsuario) throws UnauthorizedException{
         Optional<Usuario> resultado = usuarioServiceAPI.findByUsernameAndPassword(request.getUsername(), request.getPassword());
         if(resultado.isPresent()){
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(idUsuario);
+            audit.setAccion("LOGIN");
+            audit.setTablaAfectada("USUARIOS");
+            audit.setIdRegistroAfectado(resultado.get().getIdUsuario());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
             return ResponseEntity.ok(resultado.get());
         } else {
             throw new UnauthorizedException("Usuario o contraseña incorrectos");

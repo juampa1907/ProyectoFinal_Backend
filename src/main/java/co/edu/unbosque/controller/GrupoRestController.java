@@ -1,6 +1,8 @@
 package co.edu.unbosque.controller;
 
+import co.edu.unbosque.entity.Auditoria;
 import co.edu.unbosque.entity.Grupo;
+import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.service.api.GrupoServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
@@ -19,6 +21,9 @@ public class GrupoRestController {
     
     @Autowired
     private GrupoServiceAPI grupoServiceAPI;
+
+    @Autowired
+    private AuditoriaServiceAPI auditoriaServiceAPI;
     
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Grupo>> getAllGrupos() {
@@ -60,7 +65,7 @@ public class GrupoRestController {
     }
 
     @PutMapping("/updateGrupo")
-    public ResponseEntity<Grupo> updateGrupo(@RequestBody Grupo grupo) throws ResourceNotFoundException, GeneralException{
+    public ResponseEntity<Grupo> updateGrupo(@RequestBody Grupo grupo, @RequestHeader("X-User-Id") Integer idUsuario) throws ResourceNotFoundException, GeneralException{
         try{
             Grupo existente = grupoServiceAPI.get(grupo.getIdGrupo());
             if(existente == null){
@@ -69,6 +74,12 @@ public class GrupoRestController {
             if (grupo.getDescripcion() != null) existente.setDescripcion(grupo.getDescripcion());
             if (grupo.getEstado() != null) existente.setEstado(grupo.getEstado());
             Grupo resultado = grupoServiceAPI.update(existente);
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(idUsuario);
+            audit.setAccion("UPDATE");
+            audit.setTablaAfectada("GRUPOS");
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
             throw e;
