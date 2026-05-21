@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public abstract class GenericServiceImpl<T, ID extends Serializable> implements GenericServiceAPI<T, ID> {
 
+    public abstract CrudRepository<T, ID> getDao();
+
     @Override
     public T save(T entity) {
         return getDao().save(entity);
@@ -36,5 +38,8 @@ public abstract class GenericServiceImpl<T, ID extends Serializable> implements 
         return resultList;
     }
 
-    public abstract CrudRepository<T, ID> getDao();
+    @Override
+    public T update(T entity) {
+        return getDao().save(entity);
+    }
 }

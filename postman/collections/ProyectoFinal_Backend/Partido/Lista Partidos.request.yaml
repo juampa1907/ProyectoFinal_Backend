@@ -1,0 +1,5 @@
+$kind: http-request
+name: Lista Partidos
+url: localhost:8080/ProyectoFinal_Backend/api/partido/getAll
+method: GET
+order: 1779219126471

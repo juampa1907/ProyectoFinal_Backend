@@ -1,18 +1,20 @@
 $kind: http-request
 name: Crear Usuario
-url: localhost:8080/api/proyecto/saveUsuario
+url: localhost:8080/ProyectoFinal_Backend/api/proyecto/saveUsuario
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    \"username\":\"Sof1907\",\r
+    \    \"username\":\"juampa1907\",\r
 
-    \    \"password\":\"User1234\",\r
+    \    \"password\":\"Admin123\",\r
 
-    \    \"nombreApellido\":\"Vivian Sofia Sierra Rivera\",\r
+    \    \"nombreApellido\":\"Juan Pablo Gomez Casseres Espinosa\",\r
 
-    \    \"idRol\": 2\r
+    \    \"idRol\": 1,\r
+
+    \    \"correo\": \"juampasemi19@gmail.com\"\r
 
     }"
 order: 1778601883952

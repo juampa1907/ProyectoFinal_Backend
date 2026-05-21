@@ -9,4 +9,5 @@ import java.util.List;
 public interface EquipoRepository extends CrudRepository<Equipo, Integer> {
     List<Equipo> findByIdGrupo(String idGrupo);
     List<Equipo> findByEstado(String estado);
+    boolean existsByNombre(String nombre);
 }

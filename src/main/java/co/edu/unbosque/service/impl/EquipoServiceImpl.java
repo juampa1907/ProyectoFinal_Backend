@@ -29,4 +29,9 @@ public class EquipoServiceImpl extends GenericServiceImpl<Equipo, Integer> imple
     public List<Equipo> findByEstado(String estado) {
         return equipoRepository.findByEstado(estado);
     }
+
+    @Override
+    public boolean existsByNombre(String nombre) {
+        return equipoRepository.existsByNombre(nombre);
+    }
 }

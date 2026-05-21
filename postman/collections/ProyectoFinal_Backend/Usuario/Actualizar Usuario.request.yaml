@@ -1,0 +1,22 @@
+$kind: http-request
+name: Actualizar Usuario
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/updateUsuario
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"idUsuario\":69,\r
+
+    \    \"username\": \"juampa1907\",\r
+
+    \    \"password\": \"Admin123\",\r
+
+    \    \"nombreApellido\":\"Juan Pablo Gomez Casseres\",\r
+
+    \    \"idRol\": 1,\r
+
+    \    \"estado\":\"A\"\r
+
+    }"
+order: 4499991265556687

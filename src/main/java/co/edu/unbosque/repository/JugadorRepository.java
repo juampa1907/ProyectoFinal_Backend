@@ -9,4 +9,5 @@ import java.util.List;
 public interface JugadorRepository extends CrudRepository<Jugador, Integer> {
     List<Jugador> findByIdEquipo(Integer idEquipo);
     List<Jugador> findByEstado(String estado);
+    boolean existsByNombre(String nombre);
 }

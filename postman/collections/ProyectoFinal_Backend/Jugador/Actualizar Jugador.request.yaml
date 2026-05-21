@@ -1,0 +1,24 @@
+$kind: http-request
+name: Actualizar Jugador
+url: localhost:8080/ProyectoFinal_Backend/api/jugador/updateJugador
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"estado\": \"A\",\r
+
+    \    \"fechaNacimiento\": \"1987-06-24\",\r
+
+    \    \"idEquipo\": 37,\r
+
+    \    \"idJugador\": 1,\r
+
+    \    \"nombre\": \"Lionel Andrés Messi Cuccitini\",\r
+
+    \    \"numeroCamiseta\": 10,\r
+
+    \    \"posicion\": \"Extremo Derecho\"\r
+
+    }"
+order: 3416857663774143

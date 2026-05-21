@@ -1,5 +1,5 @@
 $kind: http-request
 name: Encontrar Usuario por ID
-url: localhost:8080/api/proyecto/findRecord/2
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/findRecord/4
 method: GET
 order: 4447053221323110

@@ -1,0 +1,5 @@
+$kind: http-request
+name: Encontrar Grupo por Id
+url: localhost:8080/ProyectoFinal_Backend/api/grupo/findRecord/A
+method: GET
+order: 4492113249340857

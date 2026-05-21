@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RolRepository extends CrudRepository<Rol, Integer> {
+    boolean existsByNombreRol(String nombreRol);
 }

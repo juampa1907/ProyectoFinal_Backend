@@ -1,0 +1,14 @@
+$kind: http-request
+name: Ingreso de Usuario
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/login
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\" : \"Juampa1907\",\r
+
+    \    \"password\" : \"Admin12345\"\r
+
+    }"
+order: 4501061416149008

@@ -7,4 +7,5 @@ import java.util.List;
 public interface EquipoServiceAPI extends GenericServiceAPI<Equipo, Integer> {
     List<Equipo> findByIdGrupo(String idGrupo);
     List<Equipo> findByEstado(String estado);
+    boolean existsByNombre(String nombre);
 }

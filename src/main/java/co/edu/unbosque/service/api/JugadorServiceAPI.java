@@ -7,4 +7,6 @@ import java.util.List;
 public interface JugadorServiceAPI extends GenericServiceAPI<Jugador, Integer> {
     List<Jugador> findByIdEquipo(Integer idEquipo);
     List<Jugador> findByEstado(String estado);
+    boolean existsByNombre(String nombre);
+    List<Jugador> saveAll(List<Jugador> jugadores);
 }

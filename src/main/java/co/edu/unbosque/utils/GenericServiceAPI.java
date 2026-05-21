@@ -8,4 +8,5 @@ public interface GenericServiceAPI<T, ID extends Serializable> {
     void delete(ID id);
     T get(ID id);
     List<T> getAll();
+    T update(T entity);
 }

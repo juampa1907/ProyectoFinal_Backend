@@ -33,6 +33,9 @@ public class Usuario {
     @Column(name = "FECHA_ULT_CLAVE")
     private LocalDateTime fechaUltClave;
 
+    @Column(name = "CORREO", unique = true, nullable = false, length = 255)
+    private String correo;
+
     public Usuario() {
         this.estado = "A";
         this.intentos = 0;
@@ -63,4 +66,12 @@ public class Usuario {
 
     public LocalDateTime getFechaUltClave() { return fechaUltClave; }
     public void setFechaUltClave(LocalDateTime fechaUltClave) { this.fechaUltClave = fechaUltClave; }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
 }
