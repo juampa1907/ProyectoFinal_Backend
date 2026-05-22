@@ -1,0 +1,12 @@
+$kind: http-request
+name: Enviar codigo
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/enviarCodigoVerificacion
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"correo\": \"andrespedza16@gmail.com\"\r
+
+    }"
+order: 4501304693004280

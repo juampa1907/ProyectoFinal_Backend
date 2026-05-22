@@ -4,15 +4,77 @@ url: localhost:8080/ProyectoFinal_Backend/api/jugador/saveJugador
 method: POST
 body:
   type: json
-  content: "{\r
+  content: "[\r
 
-    \    \"idEquipo\":37,\r
+    \    {\r
 
-    \    \"nombre\" : \"Lionel Andrés Messi Cuccitini\",\r
+    \        \"fechaNacimiento\": \"2000-01-31\",\r
 
-    \    \"numeroCamiseta\": 10,\r
+    \        \"idEquipo\": 37,\r
 
-    \    \"fechaNacimiento\": \"1987-06-24\"\r
+    \        \"nombre\": \"Julián Álvarez\",\r
 
-    }"
+    \        \"numeroCamiseta\": 9,\r
+
+    \        \"posicion\": \"Delantero \"\r
+
+    \    },\r
+
+    \    {\r
+
+    \        \"fechaNacimiento\": \"1998-01-24\",\r
+
+    \        \"idEquipo\": 37,\r
+
+    \        \"nombre\": \"Enzo Fernández\",\r
+
+    \        \"numeroCamiseta\": 8,\r
+
+    \        \"posicion\": \"Mediocampista \"\r
+
+    \    },\r
+
+    \    {\r
+
+    \        \"fechaNacimiento\": \"1999-05-08\",\r
+
+    \        \"idEquipo\": 44,\r
+
+    \        \"nombre\": \"Luis Díaz\",\r
+
+    \        \"numeroCamiseta\": 7,\r
+
+    \        \"posicion\": \"Extremo\"\r
+
+    \    },\r
+
+    \    {\r
+
+    \        \"fechaNacimiento\": \"1997-07-12\",\r
+
+    \        \"idEquipo\": 44,\r
+
+    \        \"nombre\": \"Jhon Arias\",\r
+
+    \        \"numeroCamiseta\": 11,\r
+
+    \        \"posicion\": \"Extremo \"\r
+
+    \    },\r
+
+    \    {\r
+
+    \        \"fechaNacimiento\": \"1993-06-23\",\r
+
+    \        \"idEquipo\": 44,\r
+
+    \        \"nombre\": \"Davinson Sánchez\",\r
+
+    \        \"numeroCamiseta\": 23,\r
+
+    \        \"posicion\": \"Defensa \"\r
+
+    \    }\r
+
+    ]"
 order: 480797746182291

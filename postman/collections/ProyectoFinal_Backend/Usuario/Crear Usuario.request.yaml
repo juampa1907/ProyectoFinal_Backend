@@ -1,6 +1,6 @@
 $kind: http-request
 name: Crear Usuario
-url: localhost:8080/ProyectoFinal_Backend/api/proyecto/saveUsuario
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/saveUsuario
 method: POST
 body:
   type: json

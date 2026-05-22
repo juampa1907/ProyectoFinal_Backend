@@ -51,6 +51,11 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario, Integer> imp
     }
 
     @Override
+    public boolean existsByCorreo(String correo) {
+        return usuarioRepository.existsByCorreo(correo);
+    }
+
+    @Override
     public List<Usuario> findByIdRol(Integer idRol) {
         return usuarioRepository.findByIdRol(idRol);
     }

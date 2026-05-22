@@ -3,6 +3,8 @@ package co.edu.unbosque.controller;
 import co.edu.unbosque.entity.Auditoria;
 import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.AuditoriaServiceAPI;
+import co.edu.unbosque.service.api.CodigoVerificacionServiceAPI;
+import co.edu.unbosque.service.api.EmailServiceAPI;
 import co.edu.unbosque.service.api.UsuarioServiceAPI;
 import co.edu.unbosque.utils.HashUtil;
 import co.edu.unbosque.utils.exception.GeneralException;
@@ -23,18 +25,24 @@ import java.util.Optional;
 @RequestMapping("/api/usuario")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UsuarioRestController {
-    
+
     @Autowired
     private UsuarioServiceAPI usuarioServiceAPI;
 
     @Autowired
     private AuditoriaServiceAPI auditoriaServiceAPI;
-    
+
+    @Autowired
+    private EmailServiceAPI emailServiceAPI;
+
+    @Autowired
+    private CodigoVerificacionServiceAPI codigoVerificacionServiceAPI;
+
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
         return ResponseEntity.ok(usuarioServiceAPI.getAll());
     }
-    
+
     @PostMapping(value = "/saveUsuario")
     public ResponseEntity<Usuario> saveUsuario(@RequestBody Usuario usuario) throws GeneralException, ResourceDuplicateException {
         try{
@@ -61,7 +69,7 @@ public class UsuarioRestController {
             throw new GeneralException("Error al guardar el usuario: " + e.getMessage());
         }
     }
-    
+
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Integer id) throws ResourceNotFoundException{
         Usuario usuario = usuarioServiceAPI.get(id);
@@ -70,7 +78,7 @@ public class UsuarioRestController {
         }
         return ResponseEntity.ok(usuario);
     }
-    
+
     @DeleteMapping(value = "/deleteUsuario/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id) throws ResourceNotFoundException {
         Usuario usuario = usuarioServiceAPI.get(id);
@@ -141,6 +149,65 @@ public class UsuarioRestController {
             return ResponseEntity.ok(resultado.get());
         } else {
             throw new UnauthorizedException("Usuario o contraseña incorrectos");
+        }
+    }
+
+    @PostMapping("/enviarCodigoVerificacion")
+    public ResponseEntity<Void> enviarCodigoVerificacion(@RequestBody Usuario request)
+            throws ResourceDuplicateException {
+        String correo = request.getCorreo();
+        if (correo == null || correo.isBlank()) {
+            throw new ResourceDuplicateException("El correo es requerido");
+        }
+        if (usuarioServiceAPI.existsByCorreo(correo)) {
+            throw new ResourceDuplicateException("El correo " + correo + " ya está registrado");
+        }
+        if (request.getUsername() != null && usuarioServiceAPI.existsByUsername(request.getUsername())) {
+            throw new ResourceDuplicateException("Usuario " + request.getUsername() + " ya existente");
+        }
+        if (request.getNombreApellido() != null && usuarioServiceAPI.existsByNombreApellido(request.getNombreApellido())) {
+            throw new ResourceDuplicateException("Nombre: " + request.getNombreApellido() + " ya existente");
+        }
+        String codigo = codigoVerificacionServiceAPI.generarCodigo();
+        codigoVerificacionServiceAPI.guardarCodigo(correo, codigo);
+        emailServiceAPI.enviarCodigoVerificacion(correo, codigo);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/registrar")
+    public ResponseEntity<Usuario> registrar(@RequestBody Usuario usuario,
+                                              @RequestParam("codigoVerificacion") String codigoVerificacion)
+            throws ResourceDuplicateException, GeneralException {
+        try {
+            String correo = usuario.getCorreo();
+
+            if (codigoVerificacion == null || !codigoVerificacionServiceAPI.validarCodigo(correo, codigoVerificacion)) {
+                throw new GeneralException("Código de verificación inválido o expirado");
+            }
+
+            String passwordOriginal = usuario.getPassword();
+            Usuario guardado = usuarioServiceAPI.save(usuario);
+
+            codigoVerificacionServiceAPI.eliminarCodigo(correo);
+
+            emailServiceAPI.enviarCredenciales(guardado, passwordOriginal);
+
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(guardado.getIdUsuario());
+            audit.setAccion("CREATE");
+            audit.setTablaAfectada("USUARIOS");
+            audit.setIdRegistroAfectado(guardado.getIdUsuario());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
+
+        } catch (ResourceDuplicateException e) {
+            throw e;
+        } catch (GeneralException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException("Error al registrar el usuario: " + e.getMessage());
         }
     }
 

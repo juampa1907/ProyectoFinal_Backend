@@ -8,17 +8,17 @@ body:
 
     \    \"estado\": \"A\",\r
 
-    \    \"fechaNacimiento\": \"1987-06-24\",\r
+    \    \"fechaNacimiento\": \"2003-06-29\",\r
 
-    \    \"idEquipo\": 37,\r
+    \    \"idEquipo\": 45,\r
 
-    \    \"idJugador\": 1,\r
+    \    \"idJugador\": 3,\r
 
-    \    \"nombre\": \"Lionel Andrés Messi Cuccitini\",\r
+    \    \"nombre\": \"Jude Bellingham\",\r
 
     \    \"numeroCamiseta\": 10,\r
 
-    \    \"posicion\": \"Extremo Derecho\"\r
+    \    \"posicion\": \"Mediocampista\"\r
 
     }"
 order: 3416857663774143
