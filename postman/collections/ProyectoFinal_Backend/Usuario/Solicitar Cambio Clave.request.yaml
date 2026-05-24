@@ -1,0 +1,8 @@
+$kind: http-request
+name: Solicitar Cambio Clave
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/solicitarCambioClave
+method: POST
+body:
+  type: json
+  content: "{\r\n    \"username\":\"Ani123\"\r\n}"
+order: 4503529744066547

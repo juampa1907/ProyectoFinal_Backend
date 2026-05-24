@@ -1,0 +1,13 @@
+$kind: http-request
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/cambiarClave
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\":\"Ani123\",\r
+
+    \    \"password\":\"Pilulujua1\"\r
+
+    }"
+order: 4503573081029083

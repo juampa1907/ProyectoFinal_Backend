@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -13,6 +14,7 @@ public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceA
 
     private static final long EXPIRACION_MINUTOS = 3;
     private final Map<String, CodigoData> codigos = new ConcurrentHashMap<>();
+    private final Set<String> usuariosValidados = ConcurrentHashMap.newKeySet();
 
     @Override
     public String generarCodigo() {
@@ -50,6 +52,37 @@ public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceA
     @Override
     public void eliminarCodigo(String correo) {
         codigos.remove(correo);
+    }
+
+    @Override
+    public boolean verificarCodigoSinConsumir(String correo, String codigo) {
+        CodigoData data = codigos.get(correo);
+        if (data == null) {
+            return false;
+        }
+        if (data.isUsado()) {
+            return false;
+        }
+        if (LocalDateTime.now().isAfter(data.getExpiracion())) {
+            codigos.remove(correo);
+            return false;
+        }
+        return data.getCodigo().equals(codigo);
+    }
+
+    @Override
+    public void marcarValidado(String username) {
+        usuariosValidados.add(username);
+    }
+
+    @Override
+    public boolean estaValidado(String username) {
+        return usuariosValidados.contains(username);
+    }
+
+    @Override
+    public void limpiarValidacion(String username) {
+        usuariosValidados.remove(username);
     }
 
     private static class CodigoData {

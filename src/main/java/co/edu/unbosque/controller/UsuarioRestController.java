@@ -17,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -209,6 +211,141 @@ public class UsuarioRestController {
         } catch (Exception e) {
             throw new GeneralException("Error al registrar el usuario: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/solicitarCambioClave")
+    public ResponseEntity<Map<String, String>> solicitarCambioClave(@RequestBody Usuario request)
+            throws ResourceNotFoundException, GeneralException {
+        try {
+            String username = request.getUsername();
+            if (username == null || username.isBlank()) {
+                throw new GeneralException("El username es requerido");
+            }
+
+            Optional<Usuario> usuarioOpt = usuarioServiceAPI.findByUsername(username);
+            if (usuarioOpt.isEmpty()) {
+                throw new ResourceNotFoundException("Usuario no encontrado: " + username);
+            }
+
+            String correo = usuarioOpt.get().getCorreo();
+            String correoMask = enmascararCorreo(correo);
+
+            String codigo = codigoVerificacionServiceAPI.generarCodigo();
+            codigoVerificacionServiceAPI.guardarCodigo(correo, codigo);
+            emailServiceAPI.enviarCodigoVerificacion(correo, codigo);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("correo", correo);
+            response.put("correoMask", correoMask);
+            return ResponseEntity.ok(response);
+
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (GeneralException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException("Error al solicitar cambio de clave: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/validarCodigoCambio")
+    public ResponseEntity<Void> validarCodigoCambio(@RequestBody Usuario request)
+            throws ResourceNotFoundException, GeneralException {
+        try {
+            String username = request.getUsername();
+            String codigoVerificacion = request.getPassword();
+
+            if (username == null || username.isBlank()) {
+                throw new GeneralException("El username es requerido");
+            }
+            if (codigoVerificacion == null || codigoVerificacion.isBlank()) {
+                throw new GeneralException("El código de verificación es requerido");
+            }
+
+            Optional<Usuario> usuarioOpt = usuarioServiceAPI.findByUsername(username);
+            if (usuarioOpt.isEmpty()) {
+                throw new ResourceNotFoundException("Usuario no encontrado: " + username);
+            }
+
+            String correo = usuarioOpt.get().getCorreo();
+
+            if (!codigoVerificacionServiceAPI.verificarCodigoSinConsumir(correo, codigoVerificacion)) {
+                throw new GeneralException("Código de verificación inválido o expirado");
+            }
+
+            codigoVerificacionServiceAPI.marcarValidado(username);
+
+            return ResponseEntity.ok().build();
+
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (GeneralException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException("Error al validar el código: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/cambiarClave")
+    public ResponseEntity<Usuario> cambiarClave(@RequestBody Usuario request)
+            throws ResourceNotFoundException, GeneralException {
+        try {
+            String username = request.getUsername();
+            String newPassword = request.getPassword();
+
+            if (username == null || username.isBlank()) {
+                throw new GeneralException("El username es requerido");
+            }
+            if (!codigoVerificacionServiceAPI.estaValidado(username)) {
+                throw new GeneralException("Debe validar el código de verificación primero");
+            }
+            if (newPassword == null || newPassword.isEmpty()) {
+                throw new GeneralException("La nueva contraseña es requerida");
+            }
+
+            Optional<Usuario> usuarioOpt = usuarioServiceAPI.findByUsername(username);
+            if (usuarioOpt.isEmpty()) {
+                codigoVerificacionServiceAPI.limpiarValidacion(username);
+                throw new ResourceNotFoundException("Usuario no encontrado: " + username);
+            }
+
+            Usuario existente = usuarioOpt.get();
+            String correo = existente.getCorreo();
+
+            existente.setPassword(HashUtil.hashSHA1(newPassword));
+            existente.setFechaUltClave(LocalDateTime.now());
+
+            Usuario resultado = usuarioServiceAPI.update(existente);
+
+            codigoVerificacionServiceAPI.eliminarCodigo(correo);
+            codigoVerificacionServiceAPI.limpiarValidacion(username);
+
+            Auditoria audit = new Auditoria();
+            audit.setIdUsuario(resultado.getIdUsuario());
+            audit.setAccion("UPDATE");
+            audit.setTablaAfectada("USUARIOS");
+            audit.setIdRegistroAfectado(resultado.getIdUsuario());
+            audit.setIpCliente("127.0.0.1");
+            auditoriaServiceAPI.save(audit);
+
+            return ResponseEntity.ok(resultado);
+
+        } catch (ResourceNotFoundException e) {
+            throw e;
+        } catch (GeneralException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new GeneralException("Error al cambiar la clave: " + e.getMessage());
+        }
+    }
+
+    private String enmascararCorreo(String correo) {
+        int arrobaIndex = correo.indexOf('@');
+        if (arrobaIndex <= 1) return correo;
+        String parteLocal = correo.substring(0, arrobaIndex);
+        String dominio = correo.substring(arrobaIndex);
+        String mask = parteLocal.charAt(0) + "***" + parteLocal.charAt(parteLocal.length() - 1);
+        return mask + dominio;
     }
 
 }

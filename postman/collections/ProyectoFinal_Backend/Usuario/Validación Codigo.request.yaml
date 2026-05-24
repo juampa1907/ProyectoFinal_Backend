@@ -1,0 +1,14 @@
+$kind: http-request
+name: Validación Codigo
+url: localhost:8080/ProyectoFinal_Backend/api/usuario/validarCodigoCambio
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"username\":\"Ani123\",\r
+
+    \    \"password\": \"\"\r
+
+    }"
+order: 4503539600712354

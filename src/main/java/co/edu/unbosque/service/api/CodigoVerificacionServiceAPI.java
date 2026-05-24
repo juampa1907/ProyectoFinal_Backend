@@ -10,4 +10,12 @@ public interface CodigoVerificacionServiceAPI {
 
     void eliminarCodigo(String correo);
 
+    boolean verificarCodigoSinConsumir(String correo, String codigo);
+
+    void marcarValidado(String username);
+
+    boolean estaValidado(String username);
+
+    void limpiarValidacion(String username);
+
 }

@@ -1,5 +1,4 @@
 $kind: http-request
-name: RegistrarUsuario
 url: localhost:8080/ProyectoFinal_Backend/api/usuario/registrar?codigoVerificacion=552999
 method: POST
 queryParams:
