@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>Reporte General - Mundial 2026</title>
+<style>
+    @page {
+        size: A4;
+        margin: 20mm 15mm;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 10pt;
+        color: #2c3e50;
+        margin: 0;
+        padding: 0;
+    }
+    .header {
+        background: #1a5276;
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    .header h1 {
+        margin: 0;
+        font-size: 24pt;
+        letter-spacing: 2px;
+    }
+    .header p {
+        margin: 8px 0 0;
+        font-size: 11pt;
+        opacity: 0.9;
+    }
+    .section-title {
+        font-size: 16pt;
+        color: #1a5276;
+        border-bottom: 3px solid #2e86c1;
+        padding-bottom: 6px;
+        margin: 25px 0 15px;
+    }
+    .summary-grid {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    .summary-grid td {
+        width: 33.33%;
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #d5dbdb;
+    }
+    .summary-card {
+        display: block;
+        padding: 5px;
+    }
+    .summary-value {
+        font-size: 24pt;
+        font-weight: bold;
+        color: #1a5276;
+        display: block;
+    }
+    .summary-label {
+        font-size: 9pt;
+        color: #566573;
+        display: block;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .chart-container {
+        text-align: center;
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #d5dbdb;
+        border-radius: 6px;
+    }
+    .chart-container img {
+        max-width: 100%;
+        height: auto;
+    }
+    .chart-title {
+        font-size: 13pt;
+        color: #1a5276;
+        font-weight: bold;
+        margin-bottom: 12px;
+        text-align: center;
+    }
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 7.5pt;
+        margin-top: 10px;
+    }
+    .data-table th {
+        background: #1a5276;
+        color: white;
+        padding: 6px 4px;
+        text-align: left;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .data-table td {
+        padding: 4px;
+        border-bottom: 1px solid #d5dbdb;
+    }
+    .data-table tr:nth-child(even) {
+        background: #f2f3f4;
+    }
+    .data-table tr:hover {
+        background: #d4e6f1;
+    }
+    .footer {
+        text-align: center;
+        color: #95a5a6;
+        font-size: 8pt;
+        margin-top: 30px;
+        border-top: 1px solid #d5dbdb;
+        padding-top: 10px;
+    }
+    .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 7pt;
+        font-weight: bold;
+        color: white;
+    }
+    .badge-create { background: #27ae60; }
+    .badge-update { background: #2e86c1; }
+    .badge-delete { background: #e74c3c; }
+    .badge-login  { background: #8e44ad; }
+    .fase-list {
+        text-align: center;
+        margin: 10px 0;
+    }
+    .fase-item {
+        display: inline-block;
+        background: #ebf5fb;
+        border: 1px solid #2e86c1;
+        border-radius: 12px;
+        padding: 4px 12px;
+        margin: 3px;
+        font-size: 9pt;
+        color: #1a5276;
+    }
+    .page-break {
+        page-break-before: always;
+    }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>REPORTE GENERAL - MUNDIAL 2026</h1>
+    <p>Generado el: <span th:text="${fechaGeneracion}">23/05/2026 14:30</span></p>
+    <p th:if="${fases != null and !fases.isEmpty()}">
+        Fase(s) actual(es):
+        <span th:each="fase : ${fases}" class="fase-item" th:text="${fase}">Grupo A</span>
+    </p>
+    <p th:if="${fases == null or fases.isEmpty()}">
+        <span style="color:#f39c12;">No hay partidos registrados</span>
+    </p>
+</div>
+
+<div class="section-title">Resumen General</div>
+<table class="summary-grid">
+    <tr>
+        <td>
+            <span class="summary-value" th:text="${usuariosActivos}">0</span>
+            <span class="summary-label">Usuarios Activos</span>
+        </td>
+        <td>
+            <span class="summary-value" th:text="${usuariosInactivos}">0</span>
+            <span class="summary-label">Usuarios Inactivos</span>
+        </td>
+        <td>
+            <span class="summary-value" th:text="${equiposActivos}">0</span>
+            <span class="summary-label">Equipos Activos</span>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span class="summary-value" th:text="${jugadoresActivos}">0</span>
+            <span class="summary-label">Jugadores Activos</span>
+        </td>
+        <td>
+            <span class="summary-value" th:text="${partidosActivos}">0</span>
+            <span class="summary-label">Partidos Activos</span>
+        </td>
+        <td>
+            <span class="summary-value" th:text="${totalAuditorias}">0</span>
+            <span class="summary-label">Registros de Auditoría</span>
+        </td>
+    </tr>
+</table>
+
+<div class="page-break"></div>
+
+<div class="section-title">Gráficas Estadísticas</div>
+
+<div class="chart-container">
+    <div class="chart-title">Acciones de Auditoría</div>
+    <img th:src="'data:image/png;base64,' + ${chartAcciones}" alt="Acciones de Auditoría"/>
+</div>
+
+<div class="page-break"></div>
+
+<div class="chart-container">
+    <div class="chart-title">Partidos por Fase</div>
+    <img th:src="'data:image/png;base64,' + ${chartPartidosFase}" alt="Partidos por Fase"/>
+</div>
+
+<div class="page-break"></div>
+
+<div class="chart-container">
+    <div class="chart-title">Equipos por Grupo</div>
+    <img th:src="'data:image/png;base64,' + ${chartEquiposGrupo}" alt="Equipos por Grupo"/>
+</div>
+
+<div class="page-break"></div>
+
+<div class="chart-container">
+    <div class="chart-title">Jugadores por Equipo (Top 10)</div>
+    <img th:src="'data:image/png;base64,' + ${chartJugadoresEquipo}" alt="Jugadores por Equipo"/>
+</div>
+
+<div class="page-break"></div>
+
+<div class="section-title">Detalle de Auditoría</div>
+<p style="font-size:9pt; color:#566573; margin-bottom:8px;">
+    Total de registros: <strong th:text="${totalAuditorias}">0</strong>
+</p>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID Log</th>
+            <th>ID Usuario</th>
+            <th>Acción</th>
+            <th>Tabla Afectada</th>
+            <th>ID Registro</th>
+            <th>Fecha y Hora</th>
+            <th>IP Cliente</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="aud : ${auditorias}">
+            <td th:text="${aud.idLog}">1</td>
+            <td th:text="${aud.idUsuario}">1</td>
+            <td>
+                <span class="badge"
+                      th:classappend="'badge-' + ${#strings.toLowerCase(aud.accion)}"
+                      th:text="${aud.accion}">CREATE</span>
+            </td>
+            <td th:text="${aud.tablaAfectada}">USUARIOS</td>
+            <td th:text="${aud.idRegistroAfectado}">1</td>
+            <td th:text="${aud.fechaHora}">2026-05-23</td>
+            <td th:text="${aud.ipCliente}">127.0.0.1</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="footer">
+    Reporte generado automáticamente por el Sistema de Gestión - Mundial 2026
+</div>
+
+</body>
+</html>

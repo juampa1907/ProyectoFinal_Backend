@@ -1,0 +1,5 @@
+$kind: http-request
+name: Descargar Reporte
+url: localhost:8080/ProyectoFinal_Backend/api/reporte/generar
+method: GET
+order: 4492832574975763

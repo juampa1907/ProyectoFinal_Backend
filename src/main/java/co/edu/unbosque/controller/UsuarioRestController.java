@@ -111,10 +111,7 @@ public class UsuarioRestController {
             if (usuario.getUsername() != null) existente.setUsername(usuario.getUsername());
             if (usuario.getNombreApellido() != null) existente.setNombreApellido(usuario.getNombreApellido());
             if (usuario.getCorreo() != null) existente.setCorreo(usuario.getCorreo());
-            if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-                existente.setPassword(HashUtil.hashSHA1(usuario.getPassword()));
-                existente.setFechaUltClave(LocalDateTime.now());
-            }
+            if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) existente.setPassword(usuario.getPassword());
             if (usuario.getIdRol() != null) existente.setIdRol(usuario.getIdRol());
             if (usuario.getEstado() != null) existente.setEstado(usuario.getEstado());
 

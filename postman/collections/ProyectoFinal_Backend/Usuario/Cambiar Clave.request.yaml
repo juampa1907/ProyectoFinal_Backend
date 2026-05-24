@@ -1,4 +1,5 @@
 $kind: http-request
+name: Cambiar Clave
 url: localhost:8080/ProyectoFinal_Backend/api/usuario/cambiarClave
 method: PUT
 body:
@@ -7,7 +8,7 @@ body:
 
     \    \"username\":\"Ani123\",\r
 
-    \    \"password\":\"Pilulujua1\"\r
+    \    \"password\":\"Pilujua1\"\r
 
     }"
 order: 4503573081029083
