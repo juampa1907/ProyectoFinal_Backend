@@ -1,0 +1,18 @@
+$kind: http-request
+name: Crear Equipo
+url: localhost:8080/ProyectoFinal_Backend/api/equipo/saveEquipo
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"nombre\": \"Alemania\",\r
+
+    \    \"idGrupo\": \"E\",\r
+
+    \    \"entrenador\":\"Julian Nagelsmann\",\r
+
+    \    \"bandera\": \"https://flagcdn.com/24x18/t.png\"\r
+
+    }"
+order: 4482282800106601

@@ -33,37 +33,6 @@ public class JugadorRestController {
         return ResponseEntity.ok(jugadorServiceAPI.getAll());
     }
     
-    @PostMapping(value = "/saveJugador")
-    public ResponseEntity<List<Jugador>> saveJugadores(@RequestBody List<Jugador> jugadores) throws GeneralException, ResourceDuplicateException {
-        try{
-            for (Jugador jugador : jugadores) {
-                boolean existeJugador = jugadorServiceAPI.existsByNombre(jugador.getNombre());
-                if(existeJugador){
-                    log.warn("Duplicado: {}", jugador.getNombre());
-                    throw new ResourceDuplicateException("Jugador " + jugador.getNombre() + " ya existente");
-                }
-            }
-            List<Jugador> guardados = jugadorServiceAPI.saveAll(jugadores);
-            for (Jugador jugador : guardados) {
-                Auditoria audit = new Auditoria();
-                audit.setIdUsuario(jugador.getIdJugador());
-                audit.setAccion("CREATE");
-                audit.setTablaAfectada("JUGADORES");
-                audit.setIdRegistroAfectado(jugador.getIdJugador());
-                audit.setIpCliente("127.0.0.1");
-                auditoriaServiceAPI.save(audit);
-            }
-            log.info("Jugadores guardados: {}", guardados.size());
-            return ResponseEntity.status(HttpStatus.CREATED).body(guardados);
-        } catch (ResourceDuplicateException e) {
-            log.warn("Duplicado: {}", e.getMessage());
-            throw e;
-        } catch (Exception e){
-            log.error("Error al guardar los jugadores: {}", e.getMessage());
-            throw new GeneralException("Error al guardar los jugadores: " + e.getMessage());
-        }
-    }
-    
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Jugador> getJugadorById(@PathVariable Integer id) throws ResourceNotFoundException{
         Jugador jugador = jugadorServiceAPI.get(id);
@@ -73,25 +42,6 @@ public class JugadorRestController {
         }
         log.info("Jugador encontrado: {}", id);
         return ResponseEntity.ok(jugador);
-    }
-    
-    @DeleteMapping(value = "/deleteJugador/{id}")
-    public ResponseEntity<Void> deleteJugador(@PathVariable Integer id) throws ResourceNotFoundException {
-        Jugador jugador = jugadorServiceAPI.get(id);
-        if (jugador == null){
-            log.warn("No encontrado: {}", id);
-            throw new ResourceNotFoundException("Jugador no encontrado con id: " + id);
-        }
-        jugadorServiceAPI.delete(id);
-        Auditoria audit = new Auditoria();
-        audit.setIdUsuario(id);
-        audit.setAccion("DELETE");
-        audit.setTablaAfectada("JUGADORES");
-        audit.setIdRegistroAfectado(id);
-        audit.setIpCliente("127.0.0.1");
-        auditoriaServiceAPI.save(audit);
-        log.info("Jugador eliminado: {}", id);
-        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/updateJugador")

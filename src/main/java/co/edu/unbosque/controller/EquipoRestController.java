@@ -32,38 +32,6 @@ public class EquipoRestController {
         log.info("Listando todos los equipos");
         return ResponseEntity.ok(equipoServiceAPI.getAll());
     }
-    
-    @PostMapping(value = "/saveEquipo")
-    public ResponseEntity<Equipo> saveEquipo(@RequestBody Equipo equipo) throws GeneralException, ResourceDuplicateException {
-        try {
-            boolean existeEquipo = equipoServiceAPI.existsByNombre(equipo.getNombre());
-            if (existeEquipo) {
-                log.warn("Duplicado: {}", equipo.getNombre());
-                throw new ResourceDuplicateException("Equipo " + equipo.getNombre() + " ya existente");
-            }
-            Equipo guardado = equipoServiceAPI.save(equipo);
-            log.info("Equipo guardado: {}", guardado.getNombre());
-            return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
-        } catch (ResourceDuplicateException e) {
-            log.warn("Duplicado: {}", equipo.getNombre());
-            throw e;
-        } catch (Exception e) {
-            log.error("Error al guardar el equipo: {}", e.getMessage());
-            throw new GeneralException("Error al guardar el equipo: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping(value = "/deleteEquipo/{id}")
-    public ResponseEntity<Void> deleteEquipo(@PathVariable Integer id) throws ResourceNotFoundException {
-        Equipo equipo = equipoServiceAPI.get(id);
-        if (equipo == null) {
-            log.warn("No encontrado: {}", id);
-            throw new ResourceNotFoundException("Equipo no encontrado con id: " + id);
-        }
-        equipoServiceAPI.delete(id);
-        log.info("Equipo eliminado: {}", id);
-        return ResponseEntity.noContent().build();
-    }
 
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Equipo> getEquipoById(@PathVariable Integer id) throws ResourceNotFoundException{
@@ -85,12 +53,7 @@ public class EquipoRestController {
                 log.warn("No encontrado: {}", equipo.getIdEquipo());
                 throw new ResourceNotFoundException("Equipo no encontrado con id: " + equipo.getIdEquipo());
             }
-            if (equipo.getNombre() != null) existente.setNombre(equipo.getNombre());
-            if (equipo.getIdGrupo() != null) existente.setIdGrupo(equipo.getIdGrupo());
-            if (equipo.getEntrenador() != null) existente.setEntrenador(equipo.getEntrenador());
-            if (equipo.getBandera() != null) existente.setBandera(equipo.getBandera());
-            if (equipo.getEstado() != null) existente.setEstado(equipo.getEstado());
-            Equipo resultado = equipoServiceAPI.update(existente);
+            Equipo resultado = equipoServiceAPI.update(equipo);
             Auditoria audit = new Auditoria();
             audit.setIdUsuario(resultado.getIdEquipo());
             audit.setAccion("UPDATE");

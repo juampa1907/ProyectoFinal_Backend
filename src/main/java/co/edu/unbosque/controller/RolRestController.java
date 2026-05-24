@@ -33,39 +33,6 @@ public class RolRestController {
         return ResponseEntity.ok(rolServiceAPI.getAll());
     }
 
-
-    @PostMapping(value = "/saveRol")
-    public ResponseEntity<Rol> saveRol(@RequestBody Rol rol) throws GeneralException, ResourceDuplicateException {
-        try {
-            boolean existeRol = rolServiceAPI.existsByNombreRol(rol.getNombreRol());
-            if (existeRol) {
-                log.warn("Duplicado: {}", rol.getNombreRol());
-                throw new ResourceDuplicateException("Rol " + rol.getNombreRol() + " ya existente");
-            }
-            Rol guardado = rolServiceAPI.save(rol);
-            log.info("Rol guardado: {}", guardado.getNombreRol());
-            return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
-        } catch (ResourceDuplicateException e) {
-            log.warn("Duplicado: {}", rol.getNombreRol());
-            throw e;
-        } catch (Exception e) {
-            log.error("Error al guardar el rol: {}", e.getMessage());
-            throw new GeneralException("Error al guardar el rol: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping(value = "/deleteRol/{id}")
-    public ResponseEntity<Void> deleteRol(@PathVariable Integer id) throws ResourceNotFoundException {
-        Rol rol = rolServiceAPI.get(id);
-        if (rol == null) {
-            log.warn("No encontrado: {}", id);
-            throw new ResourceNotFoundException("Rol no encontrado con id: " + id);
-        }
-        rolServiceAPI.delete(id);
-        log.info("Rol eliminado: {}", id);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping(value = "/findRecord/{id}")
     public ResponseEntity<Rol> getRolById(@PathVariable Integer id) throws ResourceNotFoundException {
         Rol rol = rolServiceAPI.get(id);
