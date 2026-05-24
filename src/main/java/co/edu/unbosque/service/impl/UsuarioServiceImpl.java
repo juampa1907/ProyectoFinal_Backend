@@ -41,8 +41,18 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario, Integer> imp
     }
 
     @Override
+    public Optional<Usuario> findByCorreoAndPassword(String correo, String password) {
+        return usuarioRepository.findByCorreoAndPassword(correo, HashUtil.hashSHA1(password));
+    }
+
+    @Override
     public Optional<Usuario> findByUsername(String username) {
         return usuarioRepository.findByUsername(username);
+    }
+
+    @Override
+    public Optional<Usuario> findByCorreo(String correo) {
+        return usuarioRepository.findByCorreo(correo);
     }
 
     @Override

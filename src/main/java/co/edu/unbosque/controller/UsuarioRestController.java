@@ -135,20 +135,60 @@ public class UsuarioRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request) throws UnauthorizedException{
-        Optional<Usuario> resultado = usuarioServiceAPI.findByUsernameAndPassword(request.getUsername(), request.getPassword());
-        if(resultado.isPresent()){
-            Auditoria audit = new Auditoria();
-            audit.setIdUsuario(resultado.get().getIdUsuario());
-            audit.setAccion("LOGIN");
-            audit.setTablaAfectada("USUARIOS");
-            audit.setIdRegistroAfectado(resultado.get().getIdUsuario());
-            audit.setIpCliente("127.0.0.1");
-            auditoriaServiceAPI.save(audit);
-            return ResponseEntity.ok(resultado.get());
+    public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request) throws UnauthorizedException {
+        String loginValue = request.getUsername();
+        String rawPassword = request.getPassword();
+
+        Optional<Usuario> usuarioOpt;
+        if (loginValue != null && loginValue.contains("@")) {
+            usuarioOpt = usuarioServiceAPI.findByCorreo(loginValue);
         } else {
-            throw new UnauthorizedException("Usuario o contraseña incorrectos");
+            usuarioOpt = usuarioServiceAPI.findByUsername(loginValue);
         }
+
+        if (usuarioOpt.isEmpty()) {
+            throw new UnauthorizedException("Credenciales incorrectas");
+        }
+
+        Usuario usuario = usuarioOpt.get();
+
+        if ("I".equals(usuario.getEstado())) {
+            throw new UnauthorizedException("Usuario inactivo, contacte al administrador");
+        }
+
+        String hashedPassword = HashUtil.hashSHA1(rawPassword);
+        boolean passwordCorrecta = hashedPassword.equals(usuario.getPassword());
+
+        if (!passwordCorrecta) {
+            if (Integer.valueOf(1).equals(usuario.getIdRol())) {
+                throw new UnauthorizedException("Credenciales incorrectas");
+            }
+
+            int nuevosIntentos = (usuario.getIntentos() == null ? 0 : usuario.getIntentos()) + 1;
+            usuario.setIntentos(nuevosIntentos);
+
+            if (nuevosIntentos >= 3) {
+                usuario.setEstado("I");
+                usuarioServiceAPI.update(usuario);
+                throw new UnauthorizedException("Usuario bloqueado por demasiados intentos fallidos");
+            }
+
+            usuarioServiceAPI.update(usuario);
+            throw new UnauthorizedException("Credenciales incorrectas");
+        }
+
+        usuario.setIntentos(0);
+        usuarioServiceAPI.update(usuario);
+
+        Auditoria audit = new Auditoria();
+        audit.setIdUsuario(usuario.getIdUsuario());
+        audit.setAccion("LOGIN");
+        audit.setTablaAfectada("USUARIOS");
+        audit.setIdRegistroAfectado(usuario.getIdUsuario());
+        audit.setIpCliente("127.0.0.1");
+        auditoriaServiceAPI.save(audit);
+
+        return ResponseEntity.ok(usuario);
     }
 
     @PostMapping("/enviarCodigoVerificacion")
