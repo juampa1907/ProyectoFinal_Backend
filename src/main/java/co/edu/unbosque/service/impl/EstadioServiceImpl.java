@@ -1,5 +1,6 @@
 package co.edu.unbosque.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import co.edu.unbosque.service.api.EstadioServiceAPI;
 import co.edu.unbosque.repository.EstadioRepository;
 import java.util.List;
 
+@Slf4j
 @Service
 public class EstadioServiceImpl extends GenericServiceImpl<Estadio, Integer> implements EstadioServiceAPI {
 
@@ -17,11 +19,13 @@ public class EstadioServiceImpl extends GenericServiceImpl<Estadio, Integer> imp
 
     @Override
     public CrudRepository<Estadio, Integer> getDao() {
+        log.debug("Obteniendo DAO de Estadio");
         return estadioRepository;
     }
 
     @Override
     public List<Estadio> findByEstado(String estado) {
+        log.info("Buscando Estadios por estado: {}", estado);
         return estadioRepository.findByEstado(estado);
     }
 }

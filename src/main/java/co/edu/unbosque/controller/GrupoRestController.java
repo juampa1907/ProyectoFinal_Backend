@@ -7,6 +7,7 @@ import co.edu.unbosque.service.api.GrupoServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/grupo")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -27,6 +29,7 @@ public class GrupoRestController {
     
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Grupo>> getAllGrupos() {
+        log.info("Listando todos los grupos");
         return ResponseEntity.ok(grupoServiceAPI.getAll());
     }
     
@@ -35,12 +38,17 @@ public class GrupoRestController {
         try {
             boolean existeGrupo = grupoServiceAPI.existsByIdGrupo(grupo.getIdGrupo());
             if (existeGrupo) {
+                log.warn("Duplicado: {}", grupo.getIdGrupo());
                 throw new ResourceDuplicateException("Grupo " + grupo.getIdGrupo() + " ya existente");
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body(grupoServiceAPI.save(grupo));
+            Grupo guardado = grupoServiceAPI.save(grupo);
+            log.info("Grupo guardado: {}", guardado.getIdGrupo());
+            return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (ResourceDuplicateException e) {
+            log.warn("Duplicado: {}", grupo.getIdGrupo());
             throw e;
         } catch (Exception e) {
+            log.error("Error al guardar el grupo: {}", e.getMessage());
             throw new GeneralException("Error al guardar el grupo: " + e.getMessage());
         }
     }
@@ -49,9 +57,11 @@ public class GrupoRestController {
     public ResponseEntity<Void> deleteGrupo(@PathVariable String id) throws ResourceNotFoundException {
         Grupo grupo = grupoServiceAPI.get(id);
         if (grupo == null) {
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Grupo no encontrado con id: " + id);
         }
         grupoServiceAPI.delete(id);
+        log.info("Grupo eliminado: {}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -59,8 +69,10 @@ public class GrupoRestController {
     public ResponseEntity<Grupo> getGrupoById(@PathVariable String id) throws ResourceNotFoundException{
         Grupo grupo = grupoServiceAPI.get(id);
         if(grupo == null){
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Grupo no encontrado con id: " + id);
         }
+        log.info("Grupo encontrado: {}", id);
         return ResponseEntity.ok(grupo);
     }
 
@@ -69,6 +81,7 @@ public class GrupoRestController {
         try{
             Grupo existente = grupoServiceAPI.get(grupo.getIdGrupo());
             if(existente == null){
+                log.warn("No encontrado: {}", grupo.getIdGrupo());
                 throw new ResourceNotFoundException("Grupo no encontrado con id: " + grupo.getIdGrupo());
             }
             if (grupo.getDescripcion() != null) existente.setDescripcion(grupo.getDescripcion());
@@ -80,10 +93,13 @@ public class GrupoRestController {
             audit.setTablaAfectada("GRUPOS");
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Grupo actualizado: {}", resultado.getIdGrupo());
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
+            log.warn("No encontrado: {}", grupo.getIdGrupo());
             throw e;
         } catch (Exception e){
+            log.error("Error al actualizar el grupo: {}", e.getMessage());
             throw new GeneralException("Error al actualizar el grupo: " + e.getMessage());
         }
     }

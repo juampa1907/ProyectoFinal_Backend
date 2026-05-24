@@ -2,6 +2,7 @@ package co.edu.unbosque.service.impl;
 
 import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.EmailServiceAPI;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
 
+@Slf4j
 @Service
 public class EmailServiceImpl implements EmailServiceAPI {
 
@@ -18,6 +20,7 @@ public class EmailServiceImpl implements EmailServiceAPI {
     @Override
     public void enviarCodigoVerificacion(String destinatario, String codigo) {
         try {
+            log.info("Enviando código de verificación a: {}", destinatario);
             MimeMessage mensaje = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
 
@@ -39,6 +42,7 @@ public class EmailServiceImpl implements EmailServiceAPI {
             mailSender.send(mensaje);
 
         } catch (Exception e) {
+            log.error("Error al enviar código de verificación a {}: {}", destinatario, e.getMessage());
             throw new RuntimeException("Error al enviar código de verificación a " + destinatario, e);
         }
     }
@@ -46,6 +50,7 @@ public class EmailServiceImpl implements EmailServiceAPI {
     @Override
     public void enviarCredenciales(Usuario usuario, String passwordOriginal) {
         try {
+            log.info("Enviando credenciales a: {}", usuario.getCorreo());
             MimeMessage mensaje = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mensaje, true, "UTF-8");
 
@@ -70,11 +75,13 @@ public class EmailServiceImpl implements EmailServiceAPI {
             mailSender.send(mensaje);
 
         } catch (Exception e) {
+            log.error("Error al enviar credenciales a {}: {}", usuario.getCorreo(), e.getMessage());
             throw new RuntimeException("Error al enviar credenciales a " + usuario.getCorreo(), e);
         }
     }
 
     private String ofuscarPassword(String password) {
+        log.debug("Ofuscando password");
         if (password == null || password.isEmpty()) return "";
         if (password.length() <= 2) return password;
         if (password.length() <= 4) {

@@ -1,6 +1,7 @@
 package co.edu.unbosque.service.impl;
 
 import co.edu.unbosque.service.api.CodigoVerificacionServiceAPI;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Service
 public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceAPI {
 
@@ -18,6 +20,7 @@ public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceA
 
     @Override
     public String generarCodigo() {
+        log.debug("Generando código de verificación");
         Random random = new Random();
         int codigo = 100000 + random.nextInt(900000);
         return String.valueOf(codigo);
@@ -25,12 +28,14 @@ public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceA
 
     @Override
     public void guardarCodigo(String correo, String codigo) {
+        log.info("Guardando código de verificación para correo: {}", correo);
         CodigoData data = new CodigoData(codigo, LocalDateTime.now().plusMinutes(EXPIRACION_MINUTOS));
         codigos.put(correo, data);
     }
 
     @Override
     public boolean validarCodigo(String correo, String codigo) {
+        log.info("Validando código para correo: {}", correo);
         CodigoData data = codigos.get(correo);
         if (data == null) {
             return false;
@@ -51,11 +56,13 @@ public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceA
 
     @Override
     public void eliminarCodigo(String correo) {
+        log.info("Eliminando código de verificación para correo: {}", correo);
         codigos.remove(correo);
     }
 
     @Override
     public boolean verificarCodigoSinConsumir(String correo, String codigo) {
+        log.info("Verificando código sin consumir para correo: {}", correo);
         CodigoData data = codigos.get(correo);
         if (data == null) {
             return false;
@@ -72,16 +79,19 @@ public class CodigoVerificacionServiceImpl implements CodigoVerificacionServiceA
 
     @Override
     public void marcarValidado(String username) {
+        log.info("Marcando usuario como validado: {}", username);
         usuariosValidados.add(username);
     }
 
     @Override
     public boolean estaValidado(String username) {
+        log.info("Consultando si usuario está validado: {}", username);
         return usuariosValidados.contains(username);
     }
 
     @Override
     public void limpiarValidacion(String username) {
+        log.info("Limpiando validación de usuario: {}", username);
         usuariosValidados.remove(username);
     }
 

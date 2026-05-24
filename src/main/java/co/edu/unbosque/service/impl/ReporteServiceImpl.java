@@ -7,6 +7,7 @@ import co.edu.unbosque.entity.Partido;
 import co.edu.unbosque.entity.Usuario;
 import co.edu.unbosque.service.api.*;
 import co.edu.unbosque.utils.exception.GeneralException;
+import lombok.extern.slf4j.Slf4j;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.PieSectionLabelGenerator;
@@ -32,6 +33,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ReporteServiceImpl implements ReporteServiceAPI {
 
@@ -56,6 +58,7 @@ public class ReporteServiceImpl implements ReporteServiceAPI {
     @Override
     public byte[] generarReporte() throws GeneralException {
         try {
+            log.info("Generando reporte");
             List<Auditoria> auditorias = auditoriaServiceAPI.getAll();
             List<Usuario> usuarios = usuarioServiceAPI.getAll();
             List<Equipo> equipos = equipoServiceAPI.getAll();
@@ -106,11 +109,13 @@ public class ReporteServiceImpl implements ReporteServiceAPI {
             return outputStream.toByteArray();
 
         } catch (Exception e) {
+            log.error("Error al generar el reporte: {}", e.getMessage());
             throw new GeneralException("Error al generar el reporte: " + e.getMessage());
         }
     }
 
     private String generarChartAcciones(List<Auditoria> auditorias) {
+        log.debug("Generando gráfico de acciones");
         Map<String, Long> conteo = auditorias.stream()
                 .collect(Collectors.groupingBy(Auditoria::getAccion, Collectors.counting()));
 
@@ -142,6 +147,7 @@ public class ReporteServiceImpl implements ReporteServiceAPI {
     }
 
     private String generarChartPartidosFase(List<Partido> partidos) {
+        log.debug("Generando gráfico de partidos por fase");
         Map<String, Long> conteo = partidos.stream()
                 .filter(p -> p.getFase() != null)
                 .collect(Collectors.groupingBy(Partido::getFase, Collectors.counting()));
@@ -174,6 +180,7 @@ public class ReporteServiceImpl implements ReporteServiceAPI {
     }
 
     private String generarChartEquiposGrupo(List<Equipo> equipos) {
+        log.debug("Generando gráfico de equipos por grupo");
         Map<String, Long> conteo = equipos.stream()
                 .filter(e -> e.getIdGrupo() != null)
                 .collect(Collectors.groupingBy(Equipo::getIdGrupo, Collectors.counting()));
@@ -206,6 +213,7 @@ public class ReporteServiceImpl implements ReporteServiceAPI {
     }
 
     private String generarChartJugadoresEquipo(List<Jugador> jugadores, List<Equipo> equipos) {
+        log.debug("Generando gráfico de jugadores por equipo");
         Map<Integer, Long> conteo = jugadores.stream()
                 .filter(j -> j.getIdEquipo() != null)
                 .collect(Collectors.groupingBy(Jugador::getIdEquipo, Collectors.counting()));
@@ -249,10 +257,12 @@ public class ReporteServiceImpl implements ReporteServiceAPI {
 
     private String chartToBase64(JFreeChart chart, int width, int height) {
         try {
+            log.debug("Convirtiendo gráfico a Base64");
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ChartUtils.writeChartAsPNG(baos, chart, width, height);
             return Base64.getEncoder().encodeToString(baos.toByteArray());
         } catch (Exception e) {
+            log.warn("Error al convertir gráfico a Base64: {}", e.getMessage());
             return "";
         }
     }

@@ -11,6 +11,7 @@ import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
 import co.edu.unbosque.utils.exception.UnauthorizedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/usuario")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -42,6 +43,7 @@ public class UsuarioRestController {
 
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
+        log.debug("Listando todos los usuarios");
         return ResponseEntity.ok(usuarioServiceAPI.getAll());
     }
 
@@ -64,10 +66,13 @@ public class UsuarioRestController {
             audit.setIdRegistroAfectado(guardado.getIdUsuario());
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Usuario creado: {}", guardado.getUsername());
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (ResourceDuplicateException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (Exception e){
+            log.error("Error al crear usuario: {}", e.getMessage());
             throw new GeneralException("Error al guardar el usuario: " + e.getMessage());
         }
     }
@@ -78,6 +83,7 @@ public class UsuarioRestController {
         if(usuario == null){
             throw new ResourceNotFoundException("usuario no encontrado con id: " + id);
         }
+        log.info("Usuario encontrado: {}", usuario.getUsername());
         return ResponseEntity.ok(usuario);
     }
 
@@ -85,6 +91,7 @@ public class UsuarioRestController {
     public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id) throws ResourceNotFoundException {
         Usuario usuario = usuarioServiceAPI.get(id);
         if (usuario == null){
+            log.warn("Usuario no encontrado para eliminacion: id={}", id);
             throw new ResourceNotFoundException("Usuario no encontrado con id: " + id);
         }
         usuarioServiceAPI.delete(id);
@@ -95,6 +102,7 @@ public class UsuarioRestController {
         audit.setIdRegistroAfectado(id);
         audit.setIpCliente("127.0.0.1");
         auditoriaServiceAPI.save(audit);
+        log.info("Usuario eliminado: id={}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -125,11 +133,14 @@ public class UsuarioRestController {
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
 
+            log.info("Usuario actualizado: id={}", resultado.getIdUsuario());
             return ResponseEntity.ok(resultado);
 
         } catch (ResourceNotFoundException e){
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (Exception e){
+            log.error("Error al actualizar usuario: {}", e.getMessage());
             throw new GeneralException("Error al actualizar el usuario: " + e.getMessage());
         }
     }
@@ -138,6 +149,7 @@ public class UsuarioRestController {
     public ResponseEntity<Usuario> loginUsuario(@RequestBody Usuario request) throws UnauthorizedException {
         String loginValue = request.getUsername();
         String rawPassword = request.getPassword();
+        log.info("Inicio de sesion: {}", loginValue);
 
         Optional<Usuario> usuarioOpt;
         if (loginValue != null && loginValue.contains("@")) {
@@ -147,12 +159,14 @@ public class UsuarioRestController {
         }
 
         if (usuarioOpt.isEmpty()) {
+            log.warn("Credenciales incorrectas para: {}", loginValue);
             throw new UnauthorizedException("Credenciales incorrectas");
         }
 
         Usuario usuario = usuarioOpt.get();
 
         if ("I".equals(usuario.getEstado())) {
+            log.warn("Intento de login en usuario inactivo: {}", loginValue);
             throw new UnauthorizedException("Usuario inactivo, contacte al administrador");
         }
 
@@ -170,13 +184,16 @@ public class UsuarioRestController {
             if (nuevosIntentos >= 3) {
                 usuario.setEstado("I");
                 usuarioServiceAPI.update(usuario);
+                log.warn("Usuario bloqueado por intentos: {}", loginValue);
                 throw new UnauthorizedException("Usuario bloqueado por demasiados intentos fallidos");
             }
 
             usuarioServiceAPI.update(usuario);
+            log.warn("Intento fallido #{} para: {}", nuevosIntentos, loginValue);
             throw new UnauthorizedException("Credenciales incorrectas");
         }
 
+        log.info("Login exitoso: {}", usuario.getUsername());
         usuario.setIntentos(0);
         usuarioServiceAPI.update(usuario);
 
@@ -210,6 +227,7 @@ public class UsuarioRestController {
         String codigo = codigoVerificacionServiceAPI.generarCodigo();
         codigoVerificacionServiceAPI.guardarCodigo(correo, codigo);
         emailServiceAPI.enviarCodigoVerificacion(correo, codigo);
+        log.info("Codigo de verificacion enviado a: {}", correo);
         return ResponseEntity.ok().build();
     }
 
@@ -239,13 +257,17 @@ public class UsuarioRestController {
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
 
+            log.info("Usuario registrado: {}", guardado.getUsername());
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
 
         } catch (ResourceDuplicateException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (GeneralException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("Error al registrar usuario: {}", e.getMessage());
             throw new GeneralException("Error al registrar el usuario: " + e.getMessage());
         }
     }
@@ -274,13 +296,17 @@ public class UsuarioRestController {
             Map<String, String> response = new HashMap<>();
             response.put("correo", correo);
             response.put("correoMask", correoMask);
+            log.info("Codigo de cambio de clave enviado para: {}", username);
             return ResponseEntity.ok(response);
 
         } catch (ResourceNotFoundException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (GeneralException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("Error al solicitar cambio de clave: {}", e.getMessage());
             throw new GeneralException("Error al solicitar cambio de clave: " + e.getMessage());
         }
     }
@@ -312,13 +338,17 @@ public class UsuarioRestController {
 
             codigoVerificacionServiceAPI.marcarValidado(username);
 
+            log.info("Codigo validado para: {}", username);
             return ResponseEntity.ok().build();
 
         } catch (ResourceNotFoundException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (GeneralException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("Error al validar codigo: {}", e.getMessage());
             throw new GeneralException("Error al validar el código: " + e.getMessage());
         }
     }
@@ -365,13 +395,17 @@ public class UsuarioRestController {
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
 
+            log.info("Clave cambiada para: {}", username);
             return ResponseEntity.ok(resultado);
 
         } catch (ResourceNotFoundException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (GeneralException e) {
+            log.warn("{}", e.getMessage());
             throw e;
         } catch (Exception e) {
+            log.error("Error al cambiar clave: {}", e.getMessage());
             throw new GeneralException("Error al cambiar la clave: " + e.getMessage());
         }
     }

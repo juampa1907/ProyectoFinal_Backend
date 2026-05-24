@@ -1,5 +1,6 @@
 package co.edu.unbosque.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import co.edu.unbosque.repository.RolRepository;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class RolServiceImpl extends GenericServiceImpl<Rol, Integer> implements RolServiceAPI {
 
@@ -23,16 +25,19 @@ public class RolServiceImpl extends GenericServiceImpl<Rol, Integer> implements 
 
     @Override
     public CrudRepository<Rol, Integer> getDao() {
+        log.debug("Obteniendo DAO de Rol");
         return rolRepository;
     }
 
     @Override
     public boolean existsByNombreRol(String nombreRol) {
+        log.info("Verificando si existe Rol por nombreRol: {}", nombreRol);
         return rolRepository.existsByNombreRol(nombreRol);
     }
 
     @Override
     public Rol update(Rol entity) {
+        log.info("Actualizando Rol con id: {}", entity.getIdRol());
         Rol existente = get(entity.getIdRol());
         String estadoAnterior = existente.getEstado();
 

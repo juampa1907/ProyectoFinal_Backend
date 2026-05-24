@@ -6,6 +6,7 @@ import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.service.api.PartidoServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/partido")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -26,6 +28,7 @@ public class PartidoRestController {
     
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Partido>> getAllPartidos() {
+        log.info("Listando todos los partidos");
         return ResponseEntity.ok(partidoServiceAPI.getAll());
     }
     
@@ -46,8 +49,10 @@ public class PartidoRestController {
             audit.setIdRegistroAfectado(guardado.getIdPartido());
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Partido guardado: {}", guardado.getIdPartido());
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (Exception e){
+            log.error("Error al guardar el partido: {}", e.getMessage());
             throw new GeneralException("Error al guardar el partido: " + e.getMessage());
         }
     }
@@ -56,8 +61,10 @@ public class PartidoRestController {
     public ResponseEntity<Partido> getPartidoById(@PathVariable Integer id) throws ResourceNotFoundException{
         Partido partido = partidoServiceAPI.get(id);
         if(partido == null){
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Partido no encontrado con id: " + id);
         }
+        log.info("Partido encontrado: {}", id);
         return ResponseEntity.ok(partido);
     }
     
@@ -65,6 +72,7 @@ public class PartidoRestController {
     public ResponseEntity<Void> deletePartido(@PathVariable Integer id) throws ResourceNotFoundException {
         Partido partido = partidoServiceAPI.get(id);
         if (partido == null){
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Partido no encontrado con id: " + id);
         }
         partidoServiceAPI.delete(id);
@@ -75,6 +83,7 @@ public class PartidoRestController {
         audit.setIdRegistroAfectado(id);
         audit.setIpCliente("127.0.0.1");
         auditoriaServiceAPI.save(audit);
+        log.info("Partido eliminado: {}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -83,6 +92,7 @@ public class PartidoRestController {
         try{
             Partido existente = partidoServiceAPI.get(partido.getIdPartido());
             if(existente == null){
+                log.warn("No encontrado: {}", partido.getIdPartido());
                 throw new ResourceNotFoundException("Partido no encontrado con id: " + partido.getIdPartido());
             }
             if (partido.getIdEquipoLocal() != null) existente.setIdEquipoLocal(partido.getIdEquipoLocal());
@@ -100,21 +110,26 @@ public class PartidoRestController {
             audit.setIdRegistroAfectado(resultado.getIdPartido());
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Partido actualizado: {}", resultado.getIdPartido());
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
+            log.warn("No encontrado: {}", partido.getIdPartido());
             throw e;
         } catch (Exception e){
+            log.error("Error al actualizar el partido: {}", e.getMessage());
             throw new GeneralException("Error al actualizar el partido: " + e.getMessage());
         }
     }
 
     @GetMapping("/findByFase/{fase}")
     public ResponseEntity<List<Partido>> getPartidosByFase(@PathVariable String fase) {
+        log.info("Buscando partidos por fase: {}", fase);
         return ResponseEntity.ok(partidoServiceAPI.findByFase(fase));
     }
 
     @GetMapping("/findByEstado/{estado}")
     public ResponseEntity<List<Partido>> getPartidosByEstado(@PathVariable String estado) {
+        log.info("Buscando partidos por estado: {}", estado);
         return ResponseEntity.ok(partidoServiceAPI.findByEstado(estado));
     }
 }

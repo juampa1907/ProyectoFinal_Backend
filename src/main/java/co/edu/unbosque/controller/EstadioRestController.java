@@ -6,6 +6,7 @@ import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.service.api.EstadioServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/estadio")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -26,6 +28,7 @@ public class EstadioRestController {
 
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Estadio>> getAllEstadios() {
+        log.info("Listando todos los estadios");
         return ResponseEntity.ok(estadioServiceAPI.getAll());
     }
 
@@ -40,8 +43,10 @@ public class EstadioRestController {
             audit.setIdRegistroAfectado(guardado.getIdEstadio());
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Estadio guardado: {}", guardado.getIdEstadio());
             return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
         } catch (Exception e) {
+            log.error("Error al guardar el estadio: {}", e.getMessage());
             throw new GeneralException("Error al guardar el estadio: " + e.getMessage());
         }
     }
@@ -50,8 +55,10 @@ public class EstadioRestController {
     public ResponseEntity<Estadio> getEstadioById(@PathVariable Integer id) throws ResourceNotFoundException {
         Estadio estadio = estadioServiceAPI.get(id);
         if (estadio == null) {
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Estadio no encontrado con id: " + id);
         }
+        log.info("Estadio encontrado: {}", id);
         return ResponseEntity.ok(estadio);
     }
 
@@ -59,6 +66,7 @@ public class EstadioRestController {
     public ResponseEntity<Void> deleteEstadio(@PathVariable Integer id) throws ResourceNotFoundException {
         Estadio estadio = estadioServiceAPI.get(id);
         if (estadio == null) {
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Estadio no encontrado con id: " + id);
         }
         estadioServiceAPI.delete(id);
@@ -69,6 +77,7 @@ public class EstadioRestController {
         audit.setIdRegistroAfectado(id);
         audit.setIpCliente("127.0.0.1");
         auditoriaServiceAPI.save(audit);
+        log.info("Estadio eliminado: {}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -77,6 +86,7 @@ public class EstadioRestController {
         try {
             Estadio existente = estadioServiceAPI.get(estadio.getIdEstadio());
             if (existente == null) {
+                log.warn("No encontrado: {}", estadio.getIdEstadio());
                 throw new ResourceNotFoundException("Estadio no encontrado con id: " + estadio.getIdEstadio());
             }
             if (estadio.getDescripcion() != null) existente.setDescripcion(estadio.getDescripcion());
@@ -89,16 +99,20 @@ public class EstadioRestController {
             audit.setIdRegistroAfectado(resultado.getIdEstadio());
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Estadio actualizado: {}", resultado.getIdEstadio());
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e) {
+            log.warn("No encontrado: {}", estadio.getIdEstadio());
             throw e;
         } catch (Exception e) {
+            log.error("Error al actualizar el estadio: {}", e.getMessage());
             throw new GeneralException("Error al actualizar el estadio: " + e.getMessage());
         }
     }
 
     @GetMapping("/findByEstado/{estado}")
     public ResponseEntity<List<Estadio>> getEstadiosByEstado(@PathVariable String estado) {
+        log.info("Buscando estadios por estado: {}", estado);
         return ResponseEntity.ok(estadioServiceAPI.findByEstado(estado));
     }
 }

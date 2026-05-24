@@ -7,6 +7,7 @@ import co.edu.unbosque.service.api.JugadorServiceAPI;
 import co.edu.unbosque.utils.exception.GeneralException;
 import co.edu.unbosque.utils.exception.ResourceDuplicateException;
 import co.edu.unbosque.utils.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/jugador")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -27,6 +29,7 @@ public class JugadorRestController {
     
     @GetMapping(value = "/getAll")
     public ResponseEntity<List<Jugador>> getAllJugadores() {
+        log.info("Listando todos los jugadores");
         return ResponseEntity.ok(jugadorServiceAPI.getAll());
     }
     
@@ -36,6 +39,7 @@ public class JugadorRestController {
             for (Jugador jugador : jugadores) {
                 boolean existeJugador = jugadorServiceAPI.existsByNombre(jugador.getNombre());
                 if(existeJugador){
+                    log.warn("Duplicado: {}", jugador.getNombre());
                     throw new ResourceDuplicateException("Jugador " + jugador.getNombre() + " ya existente");
                 }
             }
@@ -49,10 +53,13 @@ public class JugadorRestController {
                 audit.setIpCliente("127.0.0.1");
                 auditoriaServiceAPI.save(audit);
             }
+            log.info("Jugadores guardados: {}", guardados.size());
             return ResponseEntity.status(HttpStatus.CREATED).body(guardados);
         } catch (ResourceDuplicateException e) {
+            log.warn("Duplicado: {}", e.getMessage());
             throw e;
         } catch (Exception e){
+            log.error("Error al guardar los jugadores: {}", e.getMessage());
             throw new GeneralException("Error al guardar los jugadores: " + e.getMessage());
         }
     }
@@ -61,8 +68,10 @@ public class JugadorRestController {
     public ResponseEntity<Jugador> getJugadorById(@PathVariable Integer id) throws ResourceNotFoundException{
         Jugador jugador = jugadorServiceAPI.get(id);
         if(jugador == null){
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Jugador no encontrado con id: " + id);
         }
+        log.info("Jugador encontrado: {}", id);
         return ResponseEntity.ok(jugador);
     }
     
@@ -70,6 +79,7 @@ public class JugadorRestController {
     public ResponseEntity<Void> deleteJugador(@PathVariable Integer id) throws ResourceNotFoundException {
         Jugador jugador = jugadorServiceAPI.get(id);
         if (jugador == null){
+            log.warn("No encontrado: {}", id);
             throw new ResourceNotFoundException("Jugador no encontrado con id: " + id);
         }
         jugadorServiceAPI.delete(id);
@@ -80,6 +90,7 @@ public class JugadorRestController {
         audit.setIdRegistroAfectado(id);
         audit.setIpCliente("127.0.0.1");
         auditoriaServiceAPI.save(audit);
+        log.info("Jugador eliminado: {}", id);
         return ResponseEntity.noContent().build();
     }
 
@@ -88,6 +99,7 @@ public class JugadorRestController {
         try{
             Jugador existente = jugadorServiceAPI.get(jugador.getIdJugador());
             if(existente == null){
+                log.warn("No encontrado: {}", jugador.getIdJugador());
                 throw new ResourceNotFoundException("Jugador no encontrado con id: " + jugador.getIdJugador());
             }
             if (jugador.getNombre() != null) existente.setNombre(jugador.getNombre());
@@ -104,21 +116,26 @@ public class JugadorRestController {
             audit.setIdRegistroAfectado(resultado.getIdJugador());
             audit.setIpCliente("127.0.0.1");
             auditoriaServiceAPI.save(audit);
+            log.info("Jugador actualizado: {}", resultado.getIdJugador());
             return ResponseEntity.ok(resultado);
         } catch (ResourceNotFoundException e){
+            log.warn("No encontrado: {}", jugador.getIdJugador());
             throw e;
         } catch (Exception e){
+            log.error("Error al actualizar el jugador: {}", e.getMessage());
             throw new GeneralException("Error al actualizar el jugador: " + e.getMessage());
         }
     }
 
     @GetMapping("/findByEquipo/{idEquipo}")
     public ResponseEntity<List<Jugador>> getJugadoresByEquipo(@PathVariable Integer idEquipo) {
+        log.info("Buscando jugadores por equipo: {}", idEquipo);
         return ResponseEntity.ok(jugadorServiceAPI.findByIdEquipo(idEquipo));
     }
 
     @GetMapping("/findByEstado/{estado}")
     public ResponseEntity<List<Jugador>> getJugadoresByEstado(@PathVariable String estado) {
+        log.info("Buscando jugadores por estado: {}", estado);
         return ResponseEntity.ok(jugadorServiceAPI.findByEstado(estado));
     }
 }

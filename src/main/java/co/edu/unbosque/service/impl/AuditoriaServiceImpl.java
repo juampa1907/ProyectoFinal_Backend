@@ -1,5 +1,6 @@
 package co.edu.unbosque.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import co.edu.unbosque.service.api.AuditoriaServiceAPI;
 import co.edu.unbosque.repository.AuditoriaRepository;
 import java.util.List;
 
+@Slf4j
 @Service
 public class AuditoriaServiceImpl extends GenericServiceImpl<Auditoria, Long> implements AuditoriaServiceAPI {
 
@@ -17,11 +19,13 @@ public class AuditoriaServiceImpl extends GenericServiceImpl<Auditoria, Long> im
 
     @Override
     public CrudRepository<Auditoria, Long> getDao() {
+        log.debug("Obteniendo DAO de Auditoria");
         return auditoriaRepository;
     }
 
     @Override
     public List<Auditoria> findByIdUsuario(Integer idUsuario) {
+        log.info("Buscando Auditoria por idUsuario: {}", idUsuario);
         return auditoriaRepository.findByIdUsuario(idUsuario);
     }
 }
